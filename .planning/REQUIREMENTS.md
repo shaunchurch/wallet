@@ -28,12 +28,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Transactions
 
-- [ ] **TX-01**: User can enter recipient address and ETH amount to send
-- [ ] **TX-02**: "Max" button calculates maximum sendable amount after gas
+- [x] **TX-01**: User can enter recipient address and ETH amount to send
+- [x] **TX-02**: "Max" button calculates maximum sendable amount after gas
 - [x] **TX-03**: Gas estimation always uses megaETH RPC eth_estimateGas (never local simulation)
 - [x] **TX-04**: Gas limit enforces 60,000 minimum floor for all transactions
 - [x] **TX-05**: 20% gas buffer applied on top of RPC estimate
-- [ ] **TX-06**: Transaction confirmation screen shows recipient, amount, gas cost, total cost
+- [x] **TX-06**: Transaction confirmation screen shows recipient, amount, gas cost, total cost
 - [x] **TX-07**: User can submit tx via realtime_sendRawTransaction for instant receipt
 - [x] **TX-08**: Fallback to standard send + poll if realtime_sendRawTransaction times out (10s)
 - [x] **TX-09**: Transaction result (success/failure) displayed immediately with block explorer link
@@ -158,12 +158,12 @@ Deferred to future release. Tracked but not in current roadmap.
 | ACCT-01 | Phase 2 | Complete |
 | ACCT-02 | Phase 3 | Complete |
 | ACCT-03 | Phase 3 | Complete |
-| TX-01 | Phase 4 | Pending |
-| TX-02 | Phase 4 | Pending |
+| TX-01 | Phase 4 | Complete |
+| TX-02 | Phase 4 | Complete |
 | TX-03 | Phase 4 | Complete |
 | TX-04 | Phase 4 | Complete |
 | TX-05 | Phase 4 | Complete |
-| TX-06 | Phase 4 | Pending |
+| TX-06 | Phase 4 | Complete |
 | TX-07 | Phase 4 | Complete |
 | TX-08 | Phase 4 | Complete |
 | TX-09 | Phase 4 | Complete |

@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Build & Extension Scaffold** - MV3 manifest, esbuild multi-bundle pipeline, strict CSP, deterministic builds
 - [x] **Phase 2: Cryptographic Foundation** - BIP-39/44 key derivation, AES-256-GCM vault, key isolation, crypto TDD
 - [x] **Phase 3: Wallet Core UI & Lifecycle** - Create/import flow, lock/unlock, accounts, settings, service worker persistence
-- [ ] **Phase 4: ETH Transactions** - Send/receive ETH with megaETH gas (60k min), Type 2 tx, realtime send, confirmation UI
+- [x] **Phase 4: ETH Transactions** - Send/receive ETH with megaETH gas (60k min), Type 2 tx, realtime send, confirmation UI
 - [ ] **Phase 5: Dapp Provider & Connectivity** - EIP-1193/6963 injection, content script relay, signing methods, permissions
 - [ ] **Phase 6: Real-Time Streaming** - WebSocket stateChanges, live balances, keepalive, reconnection, network health
 - [ ] **Phase 7: Transaction Intelligence** - Multidimensional gas, finality indicators, simulation preview, approval warnings
@@ -89,7 +89,7 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md -- Install micro-eth-signer, RPC provider, gas estimation, tx construction/signing, price module, manifest CSP, background handlers
 - [x] 04-02-PLAN.md -- TDD: tx serialization test vectors, gas floor enforcement, sequential nonce correctness
-- [ ] 04-03-PLAN.md -- Send flow UI (4 screens: recipient, amount, confirm, result), BalanceDisplay, store updates, App.tsx wiring
+- [x] 04-03-PLAN.md -- Send flow UI (4 screens: recipient, amount, confirm, result), BalanceDisplay, store updates, App.tsx wiring
 
 ### Phase 5: Dapp Provider & Connectivity
 **Goal**: Dapps can discover the wallet, connect with user approval, and send transactions or request signatures through standard Ethereum provider API
@@ -180,7 +180,7 @@ Note: Phases 5, 6 both depend on Phase 4. Phases 7, 8 depend on 4+6. Phase 9 dep
 | 1. Build & Extension Scaffold | 2/2 | Complete | 2026-03-01 |
 | 2. Cryptographic Foundation | 3/3 | Complete | 2026-03-01 |
 | 3. Wallet Core UI & Lifecycle | 3/3 | Complete | 2026-03-01 |
-| 4. ETH Transactions | 2/3 | In Progress | - |
+| 4. ETH Transactions | 3/3 | Complete | 2026-03-01 |
 | 5. Dapp Provider & Connectivity | 0/TBD | Not started | - |
 | 6. Real-Time Streaming | 0/TBD | Not started | - |
 | 7. Transaction Intelligence | 0/TBD | Not started | - |
