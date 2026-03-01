@@ -158,6 +158,11 @@ async function handleCreate(password: string, strength?: 128 | 256): Promise<Wal
 async function handleConfirmSeedPhrase(
   wordIndices: Array<{ position: number; word: string }>,
 ): Promise<WalletResponse> {
+  // SEC-03: require at least 3 word challenges to prevent empty-payload bypass
+  if (!Array.isArray(wordIndices) || wordIndices.length < 3) {
+    return { type: 'wallet:error', error: 'Must confirm at least 3 words' };
+  }
+
   const pending = await getPendingCreation();
   if (!pending) {
     return { type: 'wallet:error', error: 'No pending wallet creation' };
@@ -234,6 +239,7 @@ async function handleUnlock(password: string): Promise<WalletResponse> {
 
 async function handleLock(): Promise<WalletResponse> {
   await clearSession();
+  await removePendingCreation();
   return { type: 'wallet:locked' };
 }
 
@@ -246,6 +252,10 @@ async function handleGetAccounts(): Promise<WalletResponse> {
 }
 
 async function handleDeriveAccount(index: number): Promise<WalletResponse> {
+  if (!Number.isSafeInteger(index) || index < 0) {
+    return { type: 'wallet:error', error: 'Invalid account index' };
+  }
+
   const session = await getSession();
   if (!session) {
     return { type: 'wallet:error', error: 'Wallet is locked' };

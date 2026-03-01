@@ -126,7 +126,11 @@ describe('wallet lifecycle integration', () => {
 
     const res = await handleWalletMessage({
       type: 'wallet:confirmSeedPhrase',
-      wordIndices: [{ position: 0, word: 'wrongword' }],
+      wordIndices: [
+        { position: 0, word: 'wrongword' },
+        { position: 1, word: 'wrongword' },
+        { position: 2, word: 'wrongword' },
+      ],
     });
     expect(res.type).toBe('wallet:error');
     if (res.type === 'wallet:error') {
@@ -150,6 +154,7 @@ describe('wallet lifecycle integration', () => {
       wordIndices: [
         { position: 0, word: words[0] as string },
         { position: 5, word: words[5] as string },
+        { position: 9, word: words[9] as string },
       ],
     });
     expect(confirmRes.type).toBe('wallet:confirmed');
@@ -253,6 +258,7 @@ describe('wallet lifecycle integration', () => {
       type: 'wallet:confirmSeedPhrase',
       wordIndices: [
         { position: 2, word: words[2] as string },
+        { position: 5, word: words[5] as string },
         { position: 8, word: words[8] as string },
       ],
     });
@@ -299,7 +305,11 @@ describe('message response safety', () => {
       const words = created.mnemonic.split(' ');
       const confirmed = await handleWalletMessage({
         type: 'wallet:confirmSeedPhrase',
-        wordIndices: [{ position: 0, word: words[0] as string }],
+        wordIndices: [
+          { position: 0, word: words[0] as string },
+          { position: 3, word: words[3] as string },
+          { position: 7, word: words[7] as string },
+        ],
       });
       responses.push(confirmed);
     }
@@ -330,7 +340,11 @@ describe('message response safety', () => {
       const words = created.mnemonic.split(' ');
       const confirmed = await handleWalletMessage({
         type: 'wallet:confirmSeedPhrase',
-        wordIndices: [{ position: 0, word: words[0] as string }],
+        wordIndices: [
+          { position: 0, word: words[0] as string },
+          { position: 4, word: words[4] as string },
+          { position: 9, word: words[9] as string },
+        ],
       });
       expect('mnemonic' in confirmed).toBe(false);
     }
@@ -351,5 +365,84 @@ describe('message response safety', () => {
     await handleWalletMessage({ type: 'wallet:lock' });
     const unlocked = await handleWalletMessage({ type: 'wallet:unlock', password: 'pw' });
     expect('mnemonic' in unlocked).toBe(false);
+  });
+});
+
+describe('security regressions', () => {
+  beforeEach(() => {
+    resetStorage();
+  });
+
+  it('confirmSeedPhrase rejects empty wordIndices (SEC-03)', async () => {
+    await handleWalletMessage({ type: 'wallet:create', password: 'pw' });
+    const res = await handleWalletMessage({
+      type: 'wallet:confirmSeedPhrase',
+      wordIndices: [],
+    });
+    expect(res.type).toBe('wallet:error');
+    if (res.type === 'wallet:error') {
+      expect(res.error).toBe('Must confirm at least 3 words');
+    }
+    // Vault NOT persisted
+    expect(localMock._store.has('vault')).toBe(false);
+    expect(sessionMock._store.has('pendingCreation')).toBe(true);
+  });
+
+  it('confirmSeedPhrase rejects fewer than 3 words', async () => {
+    const created = await handleWalletMessage({ type: 'wallet:create', password: 'pw' });
+    if (created.type !== 'wallet:created') throw new Error('unexpected');
+    const words = created.mnemonic.split(' ');
+    const res = await handleWalletMessage({
+      type: 'wallet:confirmSeedPhrase',
+      wordIndices: [
+        { position: 0, word: words[0] as string },
+        { position: 1, word: words[1] as string },
+      ],
+    });
+    expect(res.type).toBe('wallet:error');
+    if (res.type === 'wallet:error') {
+      expect(res.error).toBe('Must confirm at least 3 words');
+    }
+  });
+
+  it('lock clears pendingCreation from session', async () => {
+    await handleWalletMessage({ type: 'wallet:create', password: 'pw' });
+    expect(sessionMock._store.has('pendingCreation')).toBe(true);
+
+    await handleWalletMessage({ type: 'wallet:lock' });
+    expect(sessionMock._store.has('pendingCreation')).toBe(false);
+  });
+
+  it('deriveAccount rejects negative index', async () => {
+    const mnemonic =
+      'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
+    await handleWalletMessage({ type: 'wallet:import', password: 'pw', mnemonic });
+    const res = await handleWalletMessage({ type: 'wallet:deriveAccount', index: -1 });
+    expect(res.type).toBe('wallet:error');
+    if (res.type === 'wallet:error') {
+      expect(res.error).toBe('Invalid account index');
+    }
+  });
+
+  it('deriveAccount rejects NaN index', async () => {
+    const mnemonic =
+      'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
+    await handleWalletMessage({ type: 'wallet:import', password: 'pw', mnemonic });
+    const res = await handleWalletMessage({ type: 'wallet:deriveAccount', index: NaN });
+    expect(res.type).toBe('wallet:error');
+    if (res.type === 'wallet:error') {
+      expect(res.error).toBe('Invalid account index');
+    }
+  });
+
+  it('deriveAccount rejects non-integer index', async () => {
+    const mnemonic =
+      'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
+    await handleWalletMessage({ type: 'wallet:import', password: 'pw', mnemonic });
+    const res = await handleWalletMessage({ type: 'wallet:deriveAccount', index: 1.5 });
+    expect(res.type).toBe('wallet:error');
+    if (res.type === 'wallet:error') {
+      expect(res.error).toBe('Invalid account index');
+    }
   });
 });
