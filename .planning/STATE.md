@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-01T21:59:10.249Z"
+status: executing
+last_updated: "2026-03-01T22:22:00Z"
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 4 of 9 (ETH Transactions) -- EXECUTING
-Plan: 1 of 3 in current phase (04-01 complete)
-Status: 04-01 complete (tx backend), 04-02 next
-Last activity: 2026-03-01 -- Plan 04-01 executed
+Plan: 2 of 3 in current phase (04-01, 04-02 complete)
+Status: 04-02 complete (tx tests), 04-03 next
+Last activity: 2026-03-01 -- Plan 04-02 executed
 
-Progress: [██████░░░░] 38%
+Progress: [███████░░░] 42%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 7min
-- Total execution time: 1.07 hours
+- Total execution time: 1.14 hours
 
 **By Phase:**
 
@@ -43,11 +43,11 @@ Progress: [██████░░░░] 38%
 | 01 | 2 | 12min | 6min |
 | 02 | 3 | 14min | 5min |
 | 03 | 3 | 17min | 6min |
-| 04 | 1 | 21min | 21min |
+| 04 | 2 | 25min | 13min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01(5m), 03-02(5m), 03-03(7m), 04-01(21m)
-- Trend: 04-01 larger scope (2 tasks, 12 files, new lib)
+- Last 5 plans: 03-02(5m), 03-03(7m), 04-01(21m), 04-02(4m)
+- Trend: 04-02 fast TDD (tests only, no prod code)
 
 *Updated after each plan completion*
 
@@ -92,6 +92,8 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-01: Recent addresses deduped by lowercase, capped at 10, in chrome.storage.local
 - [Phase 04]: 04-01: Transaction.prepare() + signBy() for EIP-1559 Type 2 via micro-eth-signer
 - [Phase 04]: 04-01: eth_gasPrice as baseFee proxy (megaETH returns effective gas price)
+- [Phase 04]: 04-02: signBy uses extraEntropy by default; known-vector compares unsigned RLP + verifies sig separately
+- [Phase 04]: 04-02: Nonce logic tested via inline helper matching background.ts pattern (not imported from background)
 
 ### Pending Todos
 
@@ -104,5 +106,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-01-PLAN.md (tx backend)
+Stopped at: Completed 04-02-PLAN.md (tx tests)
 Resume file: None

@@ -106,10 +106,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **TEST-01**: Cryptographic correctness validated against published BIP-39/BIP-44/secp256k1 test vectors
 - [x] **TEST-02**: Encryption round-trip test (encrypt vault, decrypt, verify match) with edge-case passwords
-- [ ] **TEST-03**: Transaction serialization validated against known RLP test vectors (Type 2)
-- [ ] **TEST-04**: Gas estimation floor test: no tx submitted with gas < 60,000
+- [x] **TEST-03**: Transaction serialization validated against known RLP test vectors (Type 2)
+- [x] **TEST-04**: Gas estimation floor test: no tx submitted with gas < 60,000
 - [ ] **TEST-05**: Provider isolation test: no message from content script contains key material
-- [ ] **TEST-06**: Nonce correctness test: sequential txs use sequential nonces
+- [x] **TEST-06**: Nonce correctness test: sequential txs use sequential nonces
 
 ## v2 Requirements
 
@@ -215,10 +215,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | BUILD-06 | Phase 1 | Complete |
 | TEST-01 | Phase 2 | Complete |
 | TEST-02 | Phase 2 | Complete |
-| TEST-03 | Phase 4 | Pending |
-| TEST-04 | Phase 4 | Pending |
+| TEST-03 | Phase 4 | Complete |
+| TEST-04 | Phase 4 | Complete |
 | TEST-05 | Phase 5 | Pending |
-| TEST-06 | Phase 4 | Pending |
+| TEST-06 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 74 total

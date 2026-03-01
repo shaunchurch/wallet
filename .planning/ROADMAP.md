@@ -87,8 +87,8 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md -- Install micro-eth-signer, RPC provider, gas estimation, tx construction/signing, price module, manifest CSP, background handlers
-- [ ] 04-02-PLAN.md -- TDD: tx serialization test vectors, gas floor enforcement, sequential nonce correctness
+- [x] 04-01-PLAN.md -- Install micro-eth-signer, RPC provider, gas estimation, tx construction/signing, price module, manifest CSP, background handlers
+- [x] 04-02-PLAN.md -- TDD: tx serialization test vectors, gas floor enforcement, sequential nonce correctness
 - [ ] 04-03-PLAN.md -- Send flow UI (4 screens: recipient, amount, confirm, result), BalanceDisplay, store updates, App.tsx wiring
 
 ### Phase 5: Dapp Provider & Connectivity
@@ -180,7 +180,7 @@ Note: Phases 5, 6 both depend on Phase 4. Phases 7, 8 depend on 4+6. Phase 9 dep
 | 1. Build & Extension Scaffold | 2/2 | Complete | 2026-03-01 |
 | 2. Cryptographic Foundation | 3/3 | Complete | 2026-03-01 |
 | 3. Wallet Core UI & Lifecycle | 3/3 | Complete | 2026-03-01 |
-| 4. ETH Transactions | 0/TBD | Planning | - |
+| 4. ETH Transactions | 2/3 | In Progress | - |
 | 5. Dapp Provider & Connectivity | 0/TBD | Not started | - |
 | 6. Real-Time Streaming | 0/TBD | Not started | - |
 | 7. Transaction Intelligence | 0/TBD | Not started | - |
