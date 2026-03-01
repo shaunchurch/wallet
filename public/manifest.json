@@ -4,6 +4,11 @@
   "version": "0.1.0",
   "description": "The fastest wallet for the fastest chain",
   "permissions": ["storage", "alarms"],
+  "host_permissions": [
+    "https://mainnet.megaeth.com/*",
+    "https://carrot.megaeth.com/*",
+    "https://api.coingecko.com/*"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
