@@ -102,13 +102,19 @@ export const useWalletStore = create<WalletStore>()((set, get) => ({
     const resp = await sendWalletMessage({ type: 'wallet:getAccounts' });
     if (resp.type === 'wallet:accounts') {
       // Load persisted preferences
-      const stored = await chrome.storage.local.get(['network', 'autoLockMinutes']);
+      const stored = await chrome.storage.local.get(['network', 'autoLockMinutes', 'activeAccountIndex']);
       const network = stored.network === 'testnet' ? 'testnet' : 'mainnet';
       const autoLockMinutes =
         typeof stored.autoLockMinutes === 'number' ? stored.autoLockMinutes : 15;
+      const activeAccountIndex =
+        typeof stored.activeAccountIndex === 'number' &&
+        stored.activeAccountIndex < resp.accounts.length
+          ? stored.activeAccountIndex
+          : 0;
       set({
         isLocked: false,
         accounts: resp.accounts,
+        activeAccountIndex,
         network,
         autoLockMinutes,
         currentScreen: 'main',
@@ -122,7 +128,10 @@ export const useWalletStore = create<WalletStore>()((set, get) => ({
   },
 
   setAccounts: (accounts) => set({ accounts }),
-  setActiveAccount: (index) => set({ activeAccountIndex: index }),
+  setActiveAccount: (index) => {
+    set({ activeAccountIndex: index });
+    chrome.storage.local.set({ activeAccountIndex: index });
+  },
   setNetwork: (network) => {
     set({ network });
     chrome.storage.local.set({ network });
