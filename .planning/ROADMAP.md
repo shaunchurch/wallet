@@ -67,12 +67,12 @@ Plans:
   3. User locks wallet (manual or auto-timeout at 5/15/30/60 min); chrome.storage.session is cleared; unlock requires password
   4. User can derive additional accounts and switch between them; each shows correct address with copy-to-clipboard and QR code
   5. Service worker termination and restart preserves locked/unlocked state correctly (unlocked if session key exists, locked if not)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [ ] 03-01-PLAN.md -- Zustand store, navigation, onboarding screens (welcome/create/import), lock screen, popup init
+- [ ] 03-02-PLAN.md -- Main screen (Phantom-style), sidebar account switcher, receive/QR, jazzicon, header rework
+- [ ] 03-03-PLAN.md -- Settings, auto-lock (chrome.alarms), seed export, network switcher, about page
 
 ### Phase 4: ETH Transactions
 **Goal**: User can send and receive ETH on megaETH with correct gas estimation, instant confirmation, and full transaction lifecycle
