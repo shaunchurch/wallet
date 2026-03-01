@@ -37,10 +37,12 @@ function AccountRow({
   }, [editValue, name, onRename]);
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={editing ? undefined : onSelect}
-      className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
+      onKeyDown={editing ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(); } }}
+      className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
         active ? 'bg-zinc-100 dark:bg-zinc-800' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
       }`}
     >
@@ -90,7 +92,7 @@ function AccountRow({
       >
         <polyline points="20 6 9 17 4 12" />
       </svg>
-    </button>
+    </div>
   );
 }
 
