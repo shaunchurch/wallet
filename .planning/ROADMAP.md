@@ -37,7 +37,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Project scaffold, configs, esbuild multi-bundle pipeline, entrypoints
+- [x] 01-01-PLAN.md -- Project scaffold, configs, esbuild multi-bundle pipeline, entrypoints
 - [ ] 01-02-PLAN.md -- Styled placeholder popup UI, deterministic build + pin verification tests
 
 ### Phase 2: Cryptographic Foundation
@@ -177,7 +177,7 @@ Note: Phases 5, 6 both depend on Phase 4. Phases 7, 8 depend on 4+6. Phase 9 dep
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Build & Extension Scaffold | 0/TBD | Not started | - |
+| 1. Build & Extension Scaffold | 1/2 | In progress | - |
 | 2. Cryptographic Foundation | 0/TBD | Not started | - |
 | 3. Wallet Core UI & Lifecycle | 0/TBD | Not started | - |
 | 4. ETH Transactions | 0/TBD | Not started | - |

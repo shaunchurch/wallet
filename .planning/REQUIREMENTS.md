@@ -95,11 +95,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Build & Supply Chain
 
-- [ ] **BUILD-01**: Manifest V3 extension with strict CSP (no inline scripts, no remote loading)
-- [ ] **BUILD-02**: esbuild produces separate bundles for background, content script, popup, inpage
-- [ ] **BUILD-03**: Exact version pins in package.json (no ^ or ~)
+- [x] **BUILD-01**: Manifest V3 extension with strict CSP (no inline scripts, no remote loading)
+- [x] **BUILD-02**: esbuild produces separate bundles for background, content script, popup, inpage
+- [x] **BUILD-03**: Exact version pins in package.json (no ^ or ~)
 - [ ] **BUILD-04**: Deterministic/reproducible build output
-- [ ] **BUILD-05**: No eval(), Function(), or dynamic import() from remote sources
+- [x] **BUILD-05**: No eval(), Function(), or dynamic import() from remote sources
 - [ ] **BUILD-06**: Lockfile integrity verified in CI
 
 ### Testing
@@ -207,11 +207,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | SET-03 | Phase 3 | Pending |
 | SET-04 | Phase 3 | Pending |
 | SET-05 | Phase 3 | Pending |
-| BUILD-01 | Phase 1 | Pending |
-| BUILD-02 | Phase 1 | Pending |
-| BUILD-03 | Phase 1 | Pending |
+| BUILD-01 | Phase 1 | Complete |
+| BUILD-02 | Phase 1 | Complete |
+| BUILD-03 | Phase 1 | Complete |
 | BUILD-04 | Phase 1 | Pending |
-| BUILD-05 | Phase 1 | Pending |
+| BUILD-05 | Phase 1 | Complete |
 | BUILD-06 | Phase 1 | Pending |
 | TEST-01 | Phase 2 | Pending |
 | TEST-02 | Phase 2 | Pending |
