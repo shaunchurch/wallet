@@ -100,7 +100,7 @@ EIP-7702 authorization signatures with `chainId = 0` are replayable across ALL c
 EIP-7702's authorization tuple allows `chainId = 0` for chain-agnostic delegation. Nonces are per-chain, so the same nonce value exists independently on each chain. The protocol places minimal constraints on what delegate contracts can do. Pre-existing smart contract wallets are vulnerable to front-running attacks on initialization.
 
 **How to avoid:**
-- ALWAYS set `chainId` to megaETH's chain ID (4326 mainnet / 6342 testnet) in authorization tuples -- never 0
+- ALWAYS set `chainId` to megaETH's chain ID (4326 mainnet / 6343 testnet) in authorization tuples -- never 0
 - Delegate ONLY to audited, well-known contract implementations
 - Combine delegation + initialization in a single atomic transaction to prevent front-running
 - Use explicit storage layouts (ERC-7201 namespaced storage) to prevent collisions during redelegation
@@ -197,7 +197,7 @@ Phase 1 (first submission). Submit a minimal working version early to validate S
 | megaETH `realtime_sendRawTransaction` | Not handling the 10s timeout | Implement fallback: if realtime times out, poll for receipt via `eth_getTransactionReceipt` |
 | megaETH `stateChanges` subscription | Subscribing to too many addresses | Subscribe only to active account + watched tokens; resubscribe on address change |
 | megaETH gas estimation | Using Ethereum-standard tools without modification | Use megaETH RPC directly; floor at 60k; account for storage gas in fee display |
-| EIP-1193 provider | Returning chainId as decimal string | Return hex string (`"0x10E6"` for mainnet 4326, `"0x18C6"` for testnet 6342) |
+| EIP-1193 provider | Returning chainId as decimal string | Return hex string (`"0x10E6"` for mainnet 4326, `"0x18C7"` for testnet 6343) |
 | Content script ↔ Background | Using `chrome.runtime.sendMessage` for everything | Use long-lived `chrome.runtime.connect` ports for streaming data; sendMessage for one-shot requests |
 | Token list (mega-tokenlist) | Fetching on every popup open | Cache with TTL in `chrome.storage.local`; refresh in background on alarm |
 

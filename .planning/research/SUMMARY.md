@@ -45,7 +45,7 @@ The feature set divides cleanly: everything that makes megaETH wallets better th
 - Real-time balance via `stateChanges` WebSocket — THE killer feature, ~10ms updates vs poll-on-refresh
 - Instant tx via `realtime_sendRawTransaction` — receipt in one call, no polling, no spinners
 - Finality indicator (preconfirmed → confirmed → L1 settled) — low cost, high trust signal
-- Network config for mainnet (4326) + testnet (6342)
+- Network config for mainnet (4326) + testnet (6343)
 
 **Add post-launch (v1.x after validation):**
 - ERC-20 token support, transaction history, tx simulation/balance-change preview
@@ -77,7 +77,7 @@ Build order follows dependency graph: shared types → crypto module → SW cont
 
 3. **Supply chain attack** — Trust Wallet lost $8.5M via compromised Chrome Web Store API key (Dec 2025). Pin all package versions exactly. Store CWS API key in hardware security module, never GitHub secrets. Zero-dep crypto (@noble/@scure) already minimizes attack surface. Reproducible deterministic builds must be verifiable before first public release.
 
-4. **EIP-7702 authorization replay** — chainId=0 authorizations are replayable across all chains. Always set chainId to 4326/6342. Delegate only to audited contracts. Combine delegation + initialization atomically. Defer to v2, but architect signing interface to be extensible now.
+4. **EIP-7702 authorization replay** — chainId=0 authorizations are replayable across all chains. Always set chainId to 4326/6343. Delegate only to audited contracts. Combine delegation + initialization atomically. Defer to v2, but architect signing interface to be extensible now.
 
 5. **Provider injection conflicts** — Must implement EIP-6963 (multi-wallet discovery) as primary; window.ethereum as legacy fallback. Do NOT set isMetaMask=true. Test with MetaMask + Rabby + Coinbase Wallet all installed.
 
@@ -162,7 +162,7 @@ Phases with standard patterns (skip research-phase):
 ### Primary (HIGH confidence)
 - [megaETH Realtime API docs](https://docs.megaeth.com/realtime-api) — stateChanges, realtime_sendRawTransaction, miniBlocks, keepalive
 - [megaETH MegaEVM docs](https://docs.megaeth.com/megaevm) — multidimensional gas, 60k minimum
-- [megaETH Mainnet docs](https://docs.megaeth.com/frontier) — chain IDs (4326/6342), RPC endpoints, bridge contract
+- [megaETH Mainnet docs](https://docs.megaeth.com/frontier) — chain IDs (4326/6343), RPC endpoints, bridge contract
 - [Chrome MV3 Service Worker Lifecycle](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle) — SW termination, keepalive, alarms
 - [chrome.storage API](https://developer.chrome.com/docs/extensions/reference/api/storage) — local vs session, quotas
 - [WebSockets in Extension Service Workers](https://developer.chrome.com/docs/extensions/how-to/web-platform/websockets) — WS + SW lifecycle interaction

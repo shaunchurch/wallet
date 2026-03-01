@@ -71,7 +71,7 @@ export const megaeth = defineChain({
 })
 
 export const megaethTestnet = defineChain({
-  id: 6342,
+  id: 6343,
   name: 'MegaETH Testnet',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
@@ -329,7 +329,7 @@ npm install -D web-ext
 - [megaETH Realtime API](https://docs.megaeth.com/realtime-api) — HIGH confidence
 - [megaETH MegaEVM gas model](https://docs.megaeth.com/megaevm) — HIGH confidence
 - [megaETH mainnet config](https://docs.megaeth.com/frontier) — HIGH confidence
-- [megaETH testnet config](https://chainlist.org/chain/6342) — HIGH confidence
+- [megaETH testnet config](https://chainlist.org/chain/6343) — HIGH confidence
 - [megaETH mainnet endpoints](https://chainlist.org/chain/4326) — HIGH confidence
 - [Chrome MV3 service worker lifecycle](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle) — HIGH confidence
 - [Chrome MV3 migration guide](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3) — HIGH confidence

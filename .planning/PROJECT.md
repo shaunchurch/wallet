@@ -55,7 +55,7 @@ Transactions confirm instantly and balances update in real time. The fastest cha
 - **Testing**: Full TDD for all cryptographic operations and transaction serialization
 - **Dependencies**: Exact version pins, no ^ or ~. Every new package requires justification.
 - **Build**: Deterministic/reproducible. Separate bundles for background, content script, popup.
-- **Network**: Both testnet (chain 6342) and mainnet (chain 4326) from start
+- **Network**: Both testnet (chain 6343) and mainnet (chain 4326) from start
 
 ## Key Decisions
 

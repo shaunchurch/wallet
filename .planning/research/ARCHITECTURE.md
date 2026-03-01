@@ -365,7 +365,7 @@ Popup receives unlock confirmation, navigates to Home
 | Network | Chain ID | HTTP RPC | WebSocket | Explorer |
 |---------|----------|----------|-----------|----------|
 | Mainnet | 4326 | `https://mainnet.megaeth.com/rpc` | `wss://megaeth.drpc.org` | `https://megaeth.blockscout.com` |
-| Testnet | 6342 | `https://carrot.megaeth.com/rpc` | `wss://carrot.megaeth.com/ws` | `https://megaeth-testnet-v2.blockscout.com` |
+| Testnet | 6343 | `https://carrot.megaeth.com/rpc` | `wss://carrot.megaeth.com/ws` | `https://megaeth-testnet-v2.blockscout.com` |
 
 ### megaETH-Specific Architecture Concerns
 
@@ -525,7 +525,7 @@ Phase 6: Advanced
 - [megaETH Realtime API](https://docs.megaeth.com/realtime-api) — HIGH confidence
 - [megaETH RPC Documentation](https://docs.megaeth.com/rpc) — HIGH confidence
 - [megaETH Mainnet Config (ChainList)](https://chainlist.org/chain/4326) — MEDIUM confidence
-- [megaETH Testnet Config (ChainList)](https://chainlist.org/chain/6342) — MEDIUM confidence
+- [megaETH Testnet Config (ChainList)](https://chainlist.org/chain/6343) — MEDIUM confidence
 - [Nadcab Wallet Extension Architecture Guide](https://www.nadcab.com/blog/secure-crypto-wallet-browser-extension-architecture-guide) — MEDIUM confidence
 - [EIP-7702 Implementation](https://www.quicknode.com/guides/ethereum-development/smart-contracts/eip-7702-smart-accounts) — MEDIUM confidence
 

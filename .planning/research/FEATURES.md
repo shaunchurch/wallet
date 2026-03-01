@@ -18,7 +18,7 @@ Missing any of these = users immediately switch back to MetaMask/Rabby.
 | Transaction confirmation UI | Users must review before signing | MEDIUM | Show to/from, value, gas, decoded calldata. Rabby set the bar with balance-change preview |
 | ERC-20 token balances + transfers | Users hold tokens, not just ETH | MEDIUM | Token list integration (mega.etherscan.io/tokens). Auto-discovery via transfer events or curated list |
 | Transaction history | Users expect to see past activity | MEDIUM | megaETH Etherscan API (mega.etherscan.io) or Blockscout API. Paginated, filterable |
-| Network configuration | Users need correct chain params | LOW | Chain 4326 (mainnet), 6342 (testnet). RPC: mainnet.megaeth.com/rpc. Auto-configured since megaETH-only |
+| Network configuration | Users need correct chain params | LOW | Chain 4326 (mainnet), 6343 (testnet). RPC: mainnet.megaeth.com/rpc. Auto-configured since megaETH-only |
 | Account management (multiple accounts) | HD wallets derive multiple accounts. Standard UX | LOW | BIP-44 derivation path m/44'/60'/0'/0/n |
 | Password lock/unlock | Protects against casual physical access | LOW | Encrypt vault at rest. Auto-lock on idle timeout |
 | Popup + notification UX | Chrome extension standard interaction model | MEDIUM | Manifest V3 popup, notification for pending tx approval. Must handle service worker termination |
@@ -101,7 +101,7 @@ Minimum to be useful as a daily-driver megaETH wallet.
 - [ ] Transaction confirmation UI with gas breakdown — user safety
 - [ ] Password lock + auto-lock — basic security
 - [ ] Finality indicator (preconfirmed/confirmed/settled) — low-cost high-impact differentiator
-- [ ] Network config for mainnet (4326) + testnet (6342) — developer + user coverage
+- [ ] Network config for mainnet (4326) + testnet (6343) — developer + user coverage
 
 ### Add After Validation (v1.x)
 
