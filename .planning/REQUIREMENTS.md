@@ -16,8 +16,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **SEC-05**: User sets password that encrypts vault via PBKDF2 (600k+ iterations) + AES-256-GCM
 - [x] **SEC-06**: Encrypted vault stored in chrome.storage.local; decrypted key in chrome.storage.session only while unlocked
 - [x] **SEC-07**: Private keys never leave background service worker — enforced across all code paths
-- [ ] **SEC-08**: Auto-lock clears decrypted keys after configurable timeout (5/15/30/60 min)
-- [ ] **SEC-09**: User can export seed phrase behind password re-entry and explicit warning
+- [x] **SEC-08**: Auto-lock clears decrypted keys after configurable timeout (5/15/30/60 min)
+- [x] **SEC-09**: User can export seed phrase behind password re-entry and explicit warning
 - [x] **SEC-10**: No private key material in logs, error reports, messages, or unencrypted storage
 
 ### Account Management
@@ -88,9 +88,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Settings & Info
 
 - [x] **SET-01**: Lock/unlock wallet
-- [ ] **SET-02**: Auto-lock timeout configuration (5/15/30/60 minutes)
-- [ ] **SET-03**: Network switcher (megaETH mainnet, megaETH testnet)
-- [ ] **SET-04**: About page with version, open source link, security contact
+- [x] **SET-02**: Auto-lock timeout configuration (5/15/30/60 minutes)
+- [x] **SET-03**: Network switcher (megaETH mainnet, megaETH testnet)
+- [x] **SET-04**: About page with version, open source link, security contact
 - [x] **SET-05**: Service worker resumes unlocked state from chrome.storage.session on wake-up
 
 ### Build & Supply Chain
@@ -152,8 +152,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | SEC-05 | Phase 2 | Complete |
 | SEC-06 | Phase 2 | Complete |
 | SEC-07 | Phase 2 | Complete |
-| SEC-08 | Phase 3 | Pending |
-| SEC-09 | Phase 3 | Pending |
+| SEC-08 | Phase 3 | Complete |
+| SEC-09 | Phase 3 | Complete |
 | SEC-10 | Phase 2 | Complete |
 | ACCT-01 | Phase 2 | Complete |
 | ACCT-02 | Phase 3 | Complete |
@@ -203,9 +203,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | HIST-02 | Phase 9 | Pending |
 | HIST-03 | Phase 9 | Pending |
 | SET-01 | Phase 3 | Complete |
-| SET-02 | Phase 3 | Pending |
-| SET-03 | Phase 3 | Pending |
-| SET-04 | Phase 3 | Pending |
+| SET-02 | Phase 3 | Complete |
+| SET-03 | Phase 3 | Complete |
+| SET-04 | Phase 3 | Complete |
 | SET-05 | Phase 3 | Complete |
 | BUILD-01 | Phase 1 | Complete |
 | BUILD-02 | Phase 1 | Complete |
