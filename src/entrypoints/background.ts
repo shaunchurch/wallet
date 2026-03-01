@@ -19,6 +19,42 @@ import type {
 } from '@/features/wallet/types';
 
 // ---------------------------------------------------------------------------
+// Auto-lock alarm constants (SEC-08)
+// ---------------------------------------------------------------------------
+
+const AUTO_LOCK_ALARM = 'auto-lock';
+const DEFAULT_AUTO_LOCK_MINUTES = 15;
+const VALID_AUTO_LOCK_VALUES = [5, 15, 30, 60];
+
+// ---------------------------------------------------------------------------
+// Auto-lock alarm listener (top-level -- survives SW restart)
+// ---------------------------------------------------------------------------
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name === AUTO_LOCK_ALARM) {
+    await clearSession();
+    await removePendingCreation();
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Auto-lock alarm helpers
+// ---------------------------------------------------------------------------
+
+async function resetAutoLockAlarm(): Promise<void> {
+  const result = await chrome.storage.local.get('autoLockMinutes');
+  const minutes =
+    (typeof result.autoLockMinutes === 'number' && result.autoLockMinutes) ||
+    DEFAULT_AUTO_LOCK_MINUTES;
+  await chrome.alarms.clear(AUTO_LOCK_ALARM);
+  await chrome.alarms.create(AUTO_LOCK_ALARM, { delayInMinutes: minutes });
+}
+
+async function clearAutoLockAlarm(): Promise<void> {
+  await chrome.alarms.clear(AUTO_LOCK_ALARM);
+}
+
+// ---------------------------------------------------------------------------
 // Storage helpers
 // ---------------------------------------------------------------------------
 
@@ -119,11 +155,29 @@ function toDerivedAccount(
 }
 
 // ---------------------------------------------------------------------------
+// Ready promise -- gates message handling until init completes
+// ---------------------------------------------------------------------------
+
+const ready: Promise<void> = (async () => {
+  await restoreLockout();
+  // Re-register auto-lock alarm if session exists (handles browser restart)
+  const session = await getSession();
+  if (session) {
+    const alarm = await chrome.alarms.get(AUTO_LOCK_ALARM);
+    if (!alarm) {
+      await resetAutoLockAlarm();
+    }
+  }
+})();
+
+// ---------------------------------------------------------------------------
 // Message handler
 // ---------------------------------------------------------------------------
 
 export async function handleWalletMessage(msg: WalletMessage): Promise<WalletResponse> {
   try {
+    await ready;
+
     switch (msg.type) {
       case 'wallet:create':
         return await handleCreate(msg.password, msg.strength);
@@ -141,6 +195,14 @@ export async function handleWalletMessage(msg: WalletMessage): Promise<WalletRes
         return handleGetLockoutStatus();
       case 'wallet:deriveAccount':
         return await handleDeriveAccount(msg.index);
+      case 'wallet:exportSeedPhrase':
+        return await handleExportSeedPhrase(msg.password);
+      case 'wallet:setAutoLockTimeout':
+        return await handleSetAutoLockTimeout(msg.minutes);
+      case 'wallet:getAutoLockTimeout':
+        return await handleGetAutoLockTimeout();
+      case 'wallet:heartbeat':
+        return await handleHeartbeat();
       default:
         return { type: 'wallet:error', error: 'Unknown message type' };
     }
@@ -202,6 +264,7 @@ async function handleConfirmSeedPhrase(
   await saveVault(pending.vault);
   await cacheSession({ seed: pending.seed, accounts: pending.accounts });
   await removePendingCreation();
+  await resetAutoLockAlarm();
 
   const address = pending.accounts[0]?.address as string;
   return { type: 'wallet:confirmed', address };
@@ -224,6 +287,7 @@ async function handleImport(password: string, mnemonic: string): Promise<WalletR
 
   // Clear stale derived indices from any previous wallet
   await clearDerivedIndices();
+  await resetAutoLockAlarm();
 
   return { type: 'wallet:imported', address: account.address };
 }
@@ -271,12 +335,14 @@ async function handleUnlock(password: string): Promise<WalletResponse> {
   }
 
   await cacheSession({ seed: bytesToHex(seed), accounts });
+  await resetAutoLockAlarm();
   return { type: 'wallet:unlocked', address: accounts[0]?.address as string };
 }
 
 async function handleLock(): Promise<WalletResponse> {
   await clearSession();
   await removePendingCreation();
+  await clearAutoLockAlarm();
   return { type: 'wallet:locked' };
 }
 
@@ -331,6 +397,77 @@ async function handleDeriveAccount(index: number): Promise<WalletResponse> {
 }
 
 // ---------------------------------------------------------------------------
+// SEC-09: Seed phrase export (password-gated)
+// ---------------------------------------------------------------------------
+
+async function handleExportSeedPhrase(password: string): Promise<WalletResponse> {
+  const session = await getSession();
+  if (!session) {
+    return { type: 'wallet:error', error: 'Wallet is locked' };
+  }
+
+  const vault = await loadVault();
+  if (!vault) {
+    return { type: 'wallet:error', error: 'No vault found' };
+  }
+
+  let plaintext: VaultPlaintext;
+  try {
+    plaintext = await decryptVault(vault, password);
+  } catch {
+    lockout.recordFailure();
+    await persistLockout();
+    return { type: 'wallet:error', error: 'Incorrect password' };
+  }
+
+  lockout.reset();
+  await persistLockout();
+  return { type: 'wallet:seedPhrase', mnemonic: plaintext.mnemonic };
+}
+
+// ---------------------------------------------------------------------------
+// SET-02: Auto-lock timeout configuration
+// ---------------------------------------------------------------------------
+
+async function handleSetAutoLockTimeout(minutes: number): Promise<WalletResponse> {
+  if (!VALID_AUTO_LOCK_VALUES.includes(minutes)) {
+    return { type: 'wallet:error', error: 'Invalid auto-lock timeout' };
+  }
+
+  await chrome.storage.local.set({ autoLockMinutes: minutes });
+
+  // Reset alarm with new timeout if wallet is unlocked
+  const session = await getSession();
+  if (session) {
+    await resetAutoLockAlarm();
+  }
+
+  return { type: 'wallet:settingsSaved' };
+}
+
+async function handleGetAutoLockTimeout(): Promise<WalletResponse> {
+  const result = await chrome.storage.local.get('autoLockMinutes');
+  const minutes =
+    typeof result.autoLockMinutes === 'number'
+      ? result.autoLockMinutes
+      : DEFAULT_AUTO_LOCK_MINUTES;
+  return { type: 'wallet:autoLockTimeout', minutes };
+}
+
+// ---------------------------------------------------------------------------
+// SEC-08: Heartbeat (resets auto-lock on user interaction)
+// ---------------------------------------------------------------------------
+
+async function handleHeartbeat(): Promise<WalletResponse> {
+  const session = await getSession();
+  if (!session) {
+    return { type: 'wallet:error', error: 'Wallet is locked' };
+  }
+  await resetAutoLockAlarm();
+  return { type: 'wallet:heartbeatAck' };
+}
+
+// ---------------------------------------------------------------------------
 // Listener registration
 // ---------------------------------------------------------------------------
 
@@ -355,6 +492,3 @@ console.log('[megawallet] background service worker started');
 chrome.runtime.onInstalled.addListener(() => {
   console.log('[megawallet] extension installed');
 });
-
-// Restore lockout state from session (survives SW suspension)
-restoreLockout();

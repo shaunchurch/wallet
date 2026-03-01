@@ -60,7 +60,11 @@ export type WalletMessage =
   | { type: 'wallet:lock' }
   | { type: 'wallet:getAccounts' }
   | { type: 'wallet:getLockoutStatus' }
-  | { type: 'wallet:deriveAccount'; index: number };
+  | { type: 'wallet:deriveAccount'; index: number }
+  | { type: 'wallet:exportSeedPhrase'; password: string }
+  | { type: 'wallet:setAutoLockTimeout'; minutes: number }
+  | { type: 'wallet:getAutoLockTimeout' }
+  | { type: 'wallet:heartbeat' };
 
 // Response types -- background sends back
 export type WalletResponse =
@@ -77,4 +81,8 @@ export type WalletResponse =
       remainingMs: number;
       failedAttempts: number;
     }
+  | { type: 'wallet:seedPhrase'; mnemonic: string }
+  | { type: 'wallet:autoLockTimeout'; minutes: number }
+  | { type: 'wallet:settingsSaved' }
+  | { type: 'wallet:heartbeatAck' }
   | { type: 'wallet:error'; error: string };

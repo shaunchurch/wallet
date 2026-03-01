@@ -3,7 +3,7 @@
   "name": "megawallet",
   "version": "0.1.0",
   "description": "The fastest wallet for the fastest chain",
-  "permissions": ["storage"],
+  "permissions": ["storage", "alarms"],
   "background": {
     "service_worker": "background.js",
     "type": "module"
