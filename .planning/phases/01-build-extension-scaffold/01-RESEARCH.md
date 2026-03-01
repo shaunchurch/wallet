@@ -104,7 +104,7 @@ pnpm add react react-dom react-router zustand
 pnpm add -D esbuild typescript tailwindcss @tailwindcss/postcss postcss @biomejs/biome vitest @types/chrome @types/react @types/react-dom
 ```
 
-shadcn/ui components are added individually via `npx shadcn@latest add <component>` (copies source into project).
+shadcn/ui components are added individually via `npx shadcn@3.8.5 add <component>` (copies source into project).
 
 ## Architecture Patterns
 
@@ -338,13 +338,13 @@ export function postcssPlugin(): esbuild.Plugin {
 **Warning signs:** Build fails immediately with the error above
 
 ### Pitfall 5: shadcn/ui Setup Without Vite
-**What goes wrong:** `npx shadcn@latest init` assumes Vite or Next.js; fails or generates wrong config for custom esbuild setup
+**What goes wrong:** `npx shadcn@3.8.5 init` assumes Vite or Next.js; fails or generates wrong config for custom esbuild setup
 **Why it happens:** shadcn CLI auto-detects framework; esbuild projects aren't detected
-**How to avoid:** Create `components.json` manually with correct aliases; use `npx shadcn@latest add <component>` for individual components after manual setup
+**How to avoid:** Create `components.json` manually with correct aliases; use `npx shadcn@3.8.5 add <component>` for individual components after manual setup
 **Warning signs:** CLI errors about missing vite.config or next.config
 
 ### Pitfall 6: Service Worker Termination
-**What goes wrong:** Background service worker terminates after 5 minutes of inactivity; state is lost
+**What goes wrong:** Background service worker terminates after ~30 seconds of inactivity; state is lost
 **Why it happens:** MV3 service workers are ephemeral by design (unlike MV2 persistent background pages)
 **How to avoid:** Phase 1 only: keep background.ts minimal (just a placeholder log). Real state management (Phase 2+) uses `chrome.storage.session`
 **Warning signs:** `console.log` in background.ts stops appearing in service worker DevTools
@@ -566,8 +566,8 @@ describe('version pinning', () => {
 
 1. **shadcn/ui CLI compatibility with esbuild projects**
    - What we know: CLI expects Vite/Next.js; manual `components.json` works for adding components
-   - What's unclear: Whether `npx shadcn@latest init` works at all, or if entire setup must be manual
-   - Recommendation: Create `components.json` manually, then use `npx shadcn@latest add button` etc. for individual components. If CLI fails, copy component source directly from shadcn docs.
+   - What's unclear: Whether `npx shadcn@3.8.5 init` works at all, or if entire setup must be manual
+   - Recommendation: Create `components.json` manually, then use `npx shadcn@3.8.5 add button` etc. for individual components. If CLI fails, copy component source directly from shadcn docs.
 
 2. **esbuild path alias resolution for `@/` imports**
    - What we know: TypeScript `paths` handles type checking; esbuild needs its own alias config
