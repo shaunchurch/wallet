@@ -9,7 +9,15 @@ function createStorageMock() {
   const store = new Map<string, unknown>();
   return {
     _store: store,
-    get: vi.fn(async (key: string) => {
+    get: vi.fn(async (key: string | string[]) => {
+      if (Array.isArray(key)) {
+        const result: Record<string, unknown> = {};
+        for (const k of key) {
+          const val = store.get(k);
+          if (val !== undefined) result[k] = val;
+        }
+        return result;
+      }
       const val = store.get(key);
       return val !== undefined ? { [key]: val } : {};
     }),
@@ -30,6 +38,31 @@ function createStorageMock() {
 const localMock = createStorageMock();
 const sessionMock = createStorageMock();
 
+// Alarms mock
+const alarmStore = new Map<string, chrome.alarms.Alarm>();
+const alarmListeners: Array<(alarm: chrome.alarms.Alarm) => void> = [];
+
+const alarmsMock = {
+  create: vi.fn(async (name: string, info: { delayInMinutes: number }) => {
+    alarmStore.set(name, {
+      name,
+      scheduledTime: Date.now() + info.delayInMinutes * 60_000,
+    });
+  }),
+  clear: vi.fn(async (name: string) => {
+    alarmStore.delete(name);
+    return true;
+  }),
+  get: vi.fn(async (name: string) => {
+    return alarmStore.get(name) ?? null;
+  }),
+  onAlarm: {
+    addListener: vi.fn((fn: (alarm: chrome.alarms.Alarm) => void) => {
+      alarmListeners.push(fn);
+    }),
+  },
+};
+
 const chromeMock = {
   storage: {
     local: localMock,
@@ -40,6 +73,7 @@ const chromeMock = {
     onMessage: { addListener: vi.fn() },
     onInstalled: { addListener: vi.fn() },
   },
+  alarms: alarmsMock,
 };
 
 vi.stubGlobal('chrome', chromeMock);
@@ -54,6 +88,24 @@ const { handleWalletMessage } = await import('@/entrypoints/background');
 function resetStorage() {
   localMock._store.clear();
   sessionMock._store.clear();
+  alarmStore.clear();
+}
+
+/** Create + confirm a wallet, returning the mnemonic */
+async function createAndConfirmWallet(password: string) {
+  const created = await handleWalletMessage({ type: 'wallet:create', password });
+  if (created.type !== 'wallet:created') throw new Error('create failed');
+  const words = created.mnemonic.split(' ');
+  const confirmed = await handleWalletMessage({
+    type: 'wallet:confirmSeedPhrase',
+    wordIndices: [
+      { position: 0, word: words[0] as string },
+      { position: 3, word: words[3] as string },
+      { position: 7, word: words[7] as string },
+    ],
+  });
+  if (confirmed.type !== 'wallet:confirmed') throw new Error('confirm failed');
+  return created.mnemonic;
 }
 
 // ---------------------------------------------------------------------------
@@ -444,5 +496,218 @@ describe('security regressions', () => {
     if (res.type === 'wallet:error') {
       expect(res.error).toBe('Invalid account index');
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 3 message handlers
+// ---------------------------------------------------------------------------
+
+describe('phase 3 message handlers', () => {
+  beforeEach(() => {
+    resetStorage();
+  });
+
+  describe('wallet:exportSeedPhrase (SEC-09)', () => {
+    it('returns mnemonic when password correct and wallet unlocked', async () => {
+      const mnemonic = await createAndConfirmWallet('mypass');
+
+      const res = await handleWalletMessage({
+        type: 'wallet:exportSeedPhrase',
+        password: 'mypass',
+      });
+      expect(res.type).toBe('wallet:seedPhrase');
+      if (res.type === 'wallet:seedPhrase') {
+        expect(res.mnemonic).toBe(mnemonic);
+      }
+    });
+
+    it('rejects when wallet is locked', async () => {
+      await createAndConfirmWallet('mypass');
+      await handleWalletMessage({ type: 'wallet:lock' });
+
+      const res = await handleWalletMessage({
+        type: 'wallet:exportSeedPhrase',
+        password: 'mypass',
+      });
+      expect(res.type).toBe('wallet:error');
+      if (res.type === 'wallet:error') {
+        expect(res.error).toBe('Wallet is locked');
+      }
+    });
+
+    it('rejects with wrong password and records lockout failure', async () => {
+      await createAndConfirmWallet('mypass');
+
+      const res = await handleWalletMessage({
+        type: 'wallet:exportSeedPhrase',
+        password: 'wrongpass',
+      });
+      expect(res.type).toBe('wallet:error');
+      if (res.type === 'wallet:error') {
+        expect(res.error).toBe('Incorrect password');
+      }
+
+      // Lockout failure should be recorded
+      const status = await handleWalletMessage({ type: 'wallet:getLockoutStatus' });
+      if (status.type === 'wallet:lockoutStatus') {
+        expect(status.failedAttempts).toBe(1);
+      }
+    });
+  });
+
+  describe('wallet:getLockoutStatus', () => {
+    it('returns typed lockout status fields', async () => {
+      // Lockout state is module-level and shared across tests, so we just
+      // verify the response shape and that locked=false (prior successful
+      // unlocks reset the counter).
+      // First do a successful create+confirm to reset lockout via the
+      // successful export in the previous test group.
+      const res = await handleWalletMessage({ type: 'wallet:getLockoutStatus' });
+      expect(res.type).toBe('wallet:lockoutStatus');
+      if (res.type === 'wallet:lockoutStatus') {
+        expect(typeof res.locked).toBe('boolean');
+        expect(typeof res.remainingMs).toBe('number');
+        expect(typeof res.failedAttempts).toBe('number');
+      }
+    });
+
+    it('failedAttempts increases after wrong password', async () => {
+      // Reset lockout by doing a successful unlock first
+      const mnemonic =
+        'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
+      await handleWalletMessage({ type: 'wallet:import', password: 'correct', mnemonic });
+      // Import resets lockout implicitly (no lockout check). Get baseline.
+      // Lock and do a successful unlock to reset lockout counter
+      await handleWalletMessage({ type: 'wallet:lock' });
+      await handleWalletMessage({ type: 'wallet:unlock', password: 'correct' });
+
+      const before = await handleWalletMessage({ type: 'wallet:getLockoutStatus' });
+      if (before.type !== 'wallet:lockoutStatus') throw new Error('unexpected');
+      const baseAttempts = before.failedAttempts;
+
+      // Lock and fail once
+      await handleWalletMessage({ type: 'wallet:lock' });
+      await handleWalletMessage({ type: 'wallet:unlock', password: 'wrong' });
+
+      const after = await handleWalletMessage({ type: 'wallet:getLockoutStatus' });
+      if (after.type !== 'wallet:lockoutStatus') throw new Error('unexpected');
+      expect(after.failedAttempts).toBe(baseAttempts + 1);
+
+      // Clean up: successful unlock to reset
+      await handleWalletMessage({ type: 'wallet:unlock', password: 'correct' });
+    });
+  });
+
+  describe('wallet:heartbeat', () => {
+    it('returns heartbeatAck when unlocked', async () => {
+      await createAndConfirmWallet('pw');
+
+      const res = await handleWalletMessage({ type: 'wallet:heartbeat' });
+      expect(res.type).toBe('wallet:heartbeatAck');
+    });
+
+    it('returns error when wallet is locked', async () => {
+      const res = await handleWalletMessage({ type: 'wallet:heartbeat' });
+      expect(res.type).toBe('wallet:error');
+      if (res.type === 'wallet:error') {
+        expect(res.error).toBe('Wallet is locked');
+      }
+    });
+  });
+
+  describe('wallet:setAutoLockTimeout (SET-02)', () => {
+    it('accepts valid value and returns settingsSaved', async () => {
+      const res = await handleWalletMessage({
+        type: 'wallet:setAutoLockTimeout',
+        minutes: 30,
+      });
+      expect(res.type).toBe('wallet:settingsSaved');
+
+      // Verify persisted
+      const stored = localMock._store.get('autoLockMinutes');
+      expect(stored).toBe(30);
+    });
+
+    it('rejects invalid value (not in allowed list)', async () => {
+      const res = await handleWalletMessage({
+        type: 'wallet:setAutoLockTimeout',
+        minutes: 7,
+      });
+      expect(res.type).toBe('wallet:error');
+      if (res.type === 'wallet:error') {
+        expect(res.error).toBe('Invalid auto-lock timeout');
+      }
+    });
+  });
+
+  describe('wallet:getAutoLockTimeout', () => {
+    it('returns default 15 when not set', async () => {
+      const res = await handleWalletMessage({ type: 'wallet:getAutoLockTimeout' });
+      expect(res.type).toBe('wallet:autoLockTimeout');
+      if (res.type === 'wallet:autoLockTimeout') {
+        expect(res.minutes).toBe(15);
+      }
+    });
+
+    it('returns persisted value after setAutoLockTimeout', async () => {
+      await handleWalletMessage({ type: 'wallet:setAutoLockTimeout', minutes: 60 });
+
+      const res = await handleWalletMessage({ type: 'wallet:getAutoLockTimeout' });
+      expect(res.type).toBe('wallet:autoLockTimeout');
+      if (res.type === 'wallet:autoLockTimeout') {
+        expect(res.minutes).toBe(60);
+      }
+    });
+  });
+
+  describe('auto-lock alarm lifecycle (SEC-08)', () => {
+    it('alarm created on unlock', async () => {
+      // Use create+confirm to get a clean wallet with reset lockout
+      await createAndConfirmWallet('pw');
+      await handleWalletMessage({ type: 'wallet:lock' });
+
+      alarmStore.clear();
+      await handleWalletMessage({ type: 'wallet:unlock', password: 'pw' });
+      expect(alarmStore.has('auto-lock')).toBe(true);
+    });
+
+    it('alarm cleared on lock', async () => {
+      await createAndConfirmWallet('pw');
+      expect(alarmStore.has('auto-lock')).toBe(true);
+
+      await handleWalletMessage({ type: 'wallet:lock' });
+      expect(alarmStore.has('auto-lock')).toBe(false);
+    });
+
+    it('alarm created on import', async () => {
+      const mnemonic =
+        'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
+      await handleWalletMessage({ type: 'wallet:import', password: 'pw', mnemonic });
+      expect(alarmStore.has('auto-lock')).toBe(true);
+    });
+
+    it('heartbeat resets alarm when unlocked', async () => {
+      await createAndConfirmWallet('pw');
+      // Alarm exists from createAndConfirmWallet
+
+      // Small delay to ensure different scheduledTime
+      await new Promise((r) => setTimeout(r, 10));
+      await handleWalletMessage({ type: 'wallet:heartbeat' });
+
+      const afterAlarm = alarmStore.get('auto-lock');
+      // Alarm should be recreated (scheduledTime may differ)
+      expect(afterAlarm).toBeDefined();
+      expect(alarmsMock.clear).toHaveBeenCalled();
+    });
+  });
+
+  describe('ready-promise gate', () => {
+    it('handleWalletMessage works correctly after init', async () => {
+      // The ready promise should have resolved by now since we imported the module
+      // This tests that the gate doesn't block normal operation
+      const res = await handleWalletMessage({ type: 'wallet:getLockoutStatus' });
+      expect(res.type).toBe('wallet:lockoutStatus');
+    });
   });
 });
