@@ -1,0 +1,41 @@
+{
+  "name": "megawallet",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "The fastest wallet for the fastest chain",
+  "scripts": {
+    "build": "tsx scripts/build.ts",
+    "build:prod": "NODE_ENV=production tsx scripts/build.ts",
+    "dev": "tsx scripts/build.ts --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src/ scripts/ tests/",
+    "lint:fix": "biome check --write src/ scripts/ tests/",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-router": "7.13.1",
+    "zustand": "5.0.11"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "@biomejs/biome"]
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.4",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/chrome": "0.1.37",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "esbuild": "0.27.3",
+    "postcss": "8.5.6",
+    "tailwind-merge": "3.5.0",
+    "tailwindcss": "4.2.1",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
+  }
+}
