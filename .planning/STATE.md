@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-01T13:57:19.450Z"
+status: in-progress
+last_updated: "2026-03-01T15:44:28.000Z"
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 6
+  completed_plans: 6
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** Transactions confirm instantly and balances update in real time. The fastest chain gets the fastest wallet.
-**Current focus:** Phase 2: Cryptographic Foundation
+**Current focus:** Phase 3: Wallet Core UI & Lifecycle
 
 ## Current Position
 
-Phase: 2 of 9 (Cryptographic Foundation) -- COMPLETE
-Plan: 3 of 3 in current phase (all done)
-Status: Phase 2 complete, ready for Phase 3
-Last activity: 2026-03-01 -- Completed 02-03 background integration + key isolation
+Phase: 3 of 9 (Wallet Core UI & Lifecycle) -- IN PROGRESS
+Plan: 1 of 3 in current phase (03-01 done)
+Status: 03-01 complete, ready for 03-02
+Last activity: 2026-03-01 -- Completed 03-01 zustand store + onboarding + lock screen
 
-Progress: [███░░░░░░░] 28%
+Progress: [████░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: 5min
-- Total execution time: 0.43 hours
+- Total execution time: 0.52 hours
 
 **By Phase:**
 
@@ -42,10 +42,11 @@ Progress: [███░░░░░░░] 28%
 |-------|-------|-------|----------|
 | 01 | 2 | 12min | 6min |
 | 02 | 3 | 14min | 5min |
+| 03 | 1 | 5min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02(8m), 02-01(8m), 02-02(3m), 02-03(3m)
-- Trend: accelerating
+- Last 5 plans: 02-01(8m), 02-02(3m), 02-03(3m), 03-01(5m)
+- Trend: steady ~5min/plan
 
 *Updated after each plan completion*
 
@@ -72,6 +73,10 @@ Recent decisions affecting current work:
 - 02-03: Hex-encode seed in chrome.storage.session (JSON serialization breaks Uint8Array)
 - 02-03: pendingCreation in session storage survives MV3 worker suspension without persisting vault prematurely
 - 02-03: Sender authorization (sender.id + origin check) at listener level
+- 03-01: OnboardingContext (React context) for mnemonic passing -- never in zustand, never module-level
+- 03-01: wallet:getLockoutStatus message type added for lock screen lockout UI
+- 03-01: useEffect + ref.focus() over autoFocus for biome a11y compliance
+- 03-01: CSS @utility animate-shake via Tailwind v4 utility syntax
 
 ### Pending Todos
 
@@ -84,5 +89,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 02-03-PLAN.md (Phase 2 done)
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None

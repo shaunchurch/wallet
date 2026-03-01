@@ -87,11 +87,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Settings & Info
 
-- [ ] **SET-01**: Lock/unlock wallet
+- [x] **SET-01**: Lock/unlock wallet
 - [ ] **SET-02**: Auto-lock timeout configuration (5/15/30/60 minutes)
 - [ ] **SET-03**: Network switcher (megaETH mainnet, megaETH testnet)
 - [ ] **SET-04**: About page with version, open source link, security contact
-- [ ] **SET-05**: Service worker resumes unlocked state from chrome.storage.session on wake-up
+- [x] **SET-05**: Service worker resumes unlocked state from chrome.storage.session on wake-up
 
 ### Build & Supply Chain
 
@@ -202,11 +202,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | HIST-01 | Phase 9 | Pending |
 | HIST-02 | Phase 9 | Pending |
 | HIST-03 | Phase 9 | Pending |
-| SET-01 | Phase 3 | Pending |
+| SET-01 | Phase 3 | Complete |
 | SET-02 | Phase 3 | Pending |
 | SET-03 | Phase 3 | Pending |
 | SET-04 | Phase 3 | Pending |
-| SET-05 | Phase 3 | Pending |
+| SET-05 | Phase 3 | Complete |
 | BUILD-01 | Phase 1 | Complete |
 | BUILD-02 | Phase 1 | Complete |
 | BUILD-03 | Phase 1 | Complete |
