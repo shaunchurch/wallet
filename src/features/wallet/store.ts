@@ -31,6 +31,7 @@ interface WalletStore {
   activeAccountIndex: number;
   network: 'mainnet' | 'testnet';
   sidebarOpen: boolean;
+  accountNames: Record<number, string>;
 
   // Actions
   initialize: () => Promise<void>;
@@ -38,9 +39,12 @@ interface WalletStore {
   setActiveAccount: (index: number) => void;
   setNetwork: (network: 'mainnet' | 'testnet') => void;
   toggleSidebar: () => void;
+  closeSidebar: () => void;
+  loadAccountNames: () => Promise<void>;
+  setAccountName: (index: number, name: string) => void;
 }
 
-export const useWalletStore = create<WalletStore>()((set) => ({
+export const useWalletStore = create<WalletStore>()((set, get) => ({
   // Navigation
   screenStack: ['loading'],
   currentScreen: 'loading',
@@ -78,6 +82,7 @@ export const useWalletStore = create<WalletStore>()((set) => ({
   activeAccountIndex: 0,
   network: 'mainnet',
   sidebarOpen: false,
+  accountNames: {},
 
   // Actions
   initialize: async () => {
@@ -104,6 +109,8 @@ export const useWalletStore = create<WalletStore>()((set) => ({
         currentScreen: 'main',
         screenStack: ['main'],
       });
+      // Load account names after setting accounts
+      get().loadAccountNames();
     } else {
       set({ isLocked: true, currentScreen: 'lock', screenStack: ['lock'] });
     }
@@ -111,6 +118,23 @@ export const useWalletStore = create<WalletStore>()((set) => ({
 
   setAccounts: (accounts) => set({ accounts }),
   setActiveAccount: (index) => set({ activeAccountIndex: index }),
-  setNetwork: (network) => set({ network }),
+  setNetwork: (network) => {
+    set({ network });
+    chrome.storage.local.set({ network });
+  },
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+  closeSidebar: () => set({ sidebarOpen: false }),
+
+  loadAccountNames: async () => {
+    const result = await chrome.storage.local.get('accountNames');
+    if (result.accountNames) {
+      set({ accountNames: result.accountNames as Record<number, string> });
+    }
+  },
+
+  setAccountName: (index, name) => {
+    const updated = { ...get().accountNames, [index]: name };
+    set({ accountNames: updated });
+    chrome.storage.local.set({ accountNames: updated });
+  },
 }));

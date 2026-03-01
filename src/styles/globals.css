@@ -47,3 +47,31 @@
   --color-input: #27272a;
   --color-ring: #d4d4d8;
 }
+
+/* Sidebar slide-from-left */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  z-index: 40;
+}
+.sidebar-overlay[data-open="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.sidebar-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  transform: translateX(-100%);
+  transition: transform 200ms ease;
+  z-index: 50;
+}
+.sidebar-panel[data-open="true"] {
+  transform: translateX(0);
+}
