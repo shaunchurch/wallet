@@ -30,6 +30,7 @@ interface WalletStore {
   accounts: DerivedAccount[];
   activeAccountIndex: number;
   network: 'mainnet' | 'testnet';
+  autoLockMinutes: number;
   sidebarOpen: boolean;
   accountNames: Record<number, string>;
 
@@ -81,6 +82,7 @@ export const useWalletStore = create<WalletStore>()((set, get) => ({
   accounts: [],
   activeAccountIndex: 0,
   network: 'mainnet',
+  autoLockMinutes: 15,
   sidebarOpen: false,
   accountNames: {},
 
@@ -99,13 +101,16 @@ export const useWalletStore = create<WalletStore>()((set, get) => ({
     // Vault exists -- check if session is unlocked
     const resp = await sendWalletMessage({ type: 'wallet:getAccounts' });
     if (resp.type === 'wallet:accounts') {
-      // Load persisted network preference
-      const stored = await chrome.storage.local.get('network');
+      // Load persisted preferences
+      const stored = await chrome.storage.local.get(['network', 'autoLockMinutes']);
       const network = stored.network === 'testnet' ? 'testnet' : 'mainnet';
+      const autoLockMinutes =
+        typeof stored.autoLockMinutes === 'number' ? stored.autoLockMinutes : 15;
       set({
         isLocked: false,
         accounts: resp.accounts,
         network,
+        autoLockMinutes,
         currentScreen: 'main',
         screenStack: ['main'],
       });

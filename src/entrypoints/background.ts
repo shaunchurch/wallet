@@ -448,9 +448,7 @@ async function handleSetAutoLockTimeout(minutes: number): Promise<WalletResponse
 async function handleGetAutoLockTimeout(): Promise<WalletResponse> {
   const result = await chrome.storage.local.get('autoLockMinutes');
   const minutes =
-    typeof result.autoLockMinutes === 'number'
-      ? result.autoLockMinutes
-      : DEFAULT_AUTO_LOCK_MINUTES;
+    typeof result.autoLockMinutes === 'number' ? result.autoLockMinutes : DEFAULT_AUTO_LOCK_MINUTES;
   return { type: 'wallet:autoLockTimeout', minutes };
 }
 

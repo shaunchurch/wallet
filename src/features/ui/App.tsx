@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { sendWalletMessage } from '../wallet/messages';
 import { type Screen, useWalletStore } from '../wallet/store';
 import { OnboardingProvider } from './OnboardingContext';
 import { AboutScreen } from './screens/AboutScreen';
@@ -37,13 +38,36 @@ function LoadingScreen() {
   );
 }
 
+const HEARTBEAT_THROTTLE_MS = 60_000;
+
 export function App() {
   const currentScreen = useWalletStore((s) => s.currentScreen);
   const initialize = useWalletStore((s) => s.initialize);
+  const lastHeartbeat = useRef(0);
 
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  // SEC-08: Throttled heartbeat resets auto-lock alarm on user interaction
+  useEffect(() => {
+    function onActivity() {
+      const now = Date.now();
+      if (now - lastHeartbeat.current < HEARTBEAT_THROTTLE_MS) return;
+      lastHeartbeat.current = now;
+      sendWalletMessage({ type: 'wallet:heartbeat' }).catch(() => {
+        // Ignore -- background may be restarting
+      });
+    }
+    document.addEventListener('click', onActivity);
+    document.addEventListener('keydown', onActivity);
+    document.addEventListener('scroll', onActivity, true);
+    return () => {
+      document.removeEventListener('click', onActivity);
+      document.removeEventListener('keydown', onActivity);
+      document.removeEventListener('scroll', onActivity, true);
+    };
+  }, []);
 
   const ScreenComponent = screens[currentScreen];
 
