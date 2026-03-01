@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { sendWalletMessage } from '@/features/wallet/messages';
 import { useWalletStore } from '@/features/wallet/store';
+import { Header } from '../components/Header';
 import { SeedExportModal } from '../components/SeedExportModal';
 
 const AUTO_LOCK_OPTIONS = [
@@ -76,6 +77,8 @@ export function SettingsScreen() {
   }
 
   return (
+    <>
+    <Header />
     <div className="flex flex-1 flex-col overflow-y-auto px-4 pt-4 pb-6">
       {/* Security section */}
       <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -156,5 +159,6 @@ export function SettingsScreen() {
       {/* Seed Export Modal */}
       <SeedExportModal isOpen={seedModalOpen} onClose={() => setSeedModalOpen(false)} />
     </div>
+    </>
   );
 }

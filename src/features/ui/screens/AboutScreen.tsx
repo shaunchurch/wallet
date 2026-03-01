@@ -1,3 +1,5 @@
+import { Header } from '../components/Header';
+
 const GITHUB_URL = 'https://github.com/nicholasgriffintn/megawallet';
 const ISSUES_URL = 'https://github.com/nicholasgriffintn/megawallet/issues';
 const SECURITY_EMAIL = 'security@megawallet.dev';
@@ -34,6 +36,8 @@ export function AboutScreen() {
   const version = chrome.runtime.getManifest().version;
 
   return (
+    <>
+    <Header />
     <div className="flex flex-1 flex-col items-center px-6 pt-12 pb-6">
       {/* Logo */}
       <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-2xl font-bold text-white shadow-lg">
@@ -56,5 +60,6 @@ export function AboutScreen() {
         <LinkRow label="Security Contact" href={`mailto:${SECURITY_EMAIL}`} />
       </div>
     </div>
+    </>
   );
 }
