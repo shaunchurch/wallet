@@ -10,15 +10,15 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Key Management & Security
 
 - [x] **SEC-01**: User can generate new wallet with BIP-39 seed phrase (12 words default, 24 optional)
-- [ ] **SEC-02**: User sees seed phrase exactly once during creation with unmissable backup warning
-- [ ] **SEC-03**: User must confirm seed phrase (select words in order) before wallet is usable
+- [x] **SEC-02**: User sees seed phrase exactly once during creation with unmissable backup warning
+- [x] **SEC-03**: User must confirm seed phrase (select words in order) before wallet is usable
 - [x] **SEC-04**: User can import existing wallet via seed phrase entry
 - [x] **SEC-05**: User sets password that encrypts vault via PBKDF2 (600k+ iterations) + AES-256-GCM
-- [ ] **SEC-06**: Encrypted vault stored in chrome.storage.local; decrypted key in chrome.storage.session only while unlocked
-- [ ] **SEC-07**: Private keys never leave background service worker — enforced across all code paths
+- [x] **SEC-06**: Encrypted vault stored in chrome.storage.local; decrypted key in chrome.storage.session only while unlocked
+- [x] **SEC-07**: Private keys never leave background service worker — enforced across all code paths
 - [ ] **SEC-08**: Auto-lock clears decrypted keys after configurable timeout (5/15/30/60 min)
 - [ ] **SEC-09**: User can export seed phrase behind password re-entry and explicit warning
-- [ ] **SEC-10**: No private key material in logs, error reports, messages, or unencrypted storage
+- [x] **SEC-10**: No private key material in logs, error reports, messages, or unencrypted storage
 
 ### Account Management
 
@@ -146,15 +146,15 @@ Deferred to future release. Tracked but not in current roadmap.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SEC-01 | Phase 2 | Complete |
-| SEC-02 | Phase 2 | Pending |
-| SEC-03 | Phase 2 | Pending |
+| SEC-02 | Phase 2 | Complete |
+| SEC-03 | Phase 2 | Complete |
 | SEC-04 | Phase 2 | Complete |
 | SEC-05 | Phase 2 | Complete |
-| SEC-06 | Phase 2 | Pending |
-| SEC-07 | Phase 2 | Pending |
+| SEC-06 | Phase 2 | Complete |
+| SEC-07 | Phase 2 | Complete |
 | SEC-08 | Phase 3 | Pending |
 | SEC-09 | Phase 3 | Pending |
-| SEC-10 | Phase 2 | Pending |
+| SEC-10 | Phase 2 | Complete |
 | ACCT-01 | Phase 2 | Complete |
 | ACCT-02 | Phase 3 | Pending |
 | ACCT-03 | Phase 3 | Pending |
