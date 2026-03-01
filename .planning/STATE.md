@@ -9,29 +9,29 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 ## Current Position
 
-Phase: 1 of 9 (Build & Extension Scaffold)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-03-01 -- Completed 01-01 project scaffold
+Phase: 1 of 9 (Build & Extension Scaffold) -- COMPLETE
+Plan: 2 of 2 in current phase
+Status: Phase 1 complete, ready for Phase 2
+Last activity: 2026-03-01 -- Completed 01-02 styled popup UI + build tests
 
-Progress: [█░░░░░░░░░] 5%
+Progress: [██░░░░░░░░] 11%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4min
-- Total execution time: 0.07 hours
+- Total plans completed: 2
+- Average duration: 6min
+- Total execution time: 0.20 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01 | 1 | 4min | 4min |
+| 01 | 2 | 12min | 6min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01(4m)
-- Trend: baseline
+- Last 5 plans: 01-01(4m), 01-02(8m)
+- Trend: stable
 
 *Updated after each plan completion*
 
@@ -47,6 +47,9 @@ Recent decisions affecting current work:
 - 01-01: Biome 2.4.4 schema changed from research (ignore->removed, include->includes)
 - 01-01: pnpm.onlyBuiltDependencies for esbuild native binary approval
 - 01-01: Parallel esbuild.build() calls via Promise.all
+- 01-02: Tailwind v4 @custom-variant for class-based dark mode (not media query)
+- 01-02: Manual shadcn button copy (CLI init incompatible with esbuild)
+- 01-02: SHA-256 recursive dir hashing for deterministic build verification
 
 ### Pending Todos
 
@@ -59,5 +62,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 01-01-PLAN.md
+Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
 Resume file: None

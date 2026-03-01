@@ -12,7 +12,7 @@ MegaWallet ships in 9 phases following the dependency graph: build scaffold, the
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Build & Extension Scaffold** - MV3 manifest, esbuild multi-bundle pipeline, strict CSP, deterministic builds
+- [x] **Phase 1: Build & Extension Scaffold** - MV3 manifest, esbuild multi-bundle pipeline, strict CSP, deterministic builds
 - [ ] **Phase 2: Cryptographic Foundation** - BIP-39/44 key derivation, AES-256-GCM vault, key isolation, crypto TDD
 - [ ] **Phase 3: Wallet Core UI & Lifecycle** - Create/import flow, lock/unlock, accounts, settings, service worker persistence
 - [ ] **Phase 4: ETH Transactions** - Send/receive ETH with megaETH gas (60k min), Type 2 tx, realtime send, confirmation UI
@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- Project scaffold, configs, esbuild multi-bundle pipeline, entrypoints
-- [ ] 01-02-PLAN.md -- Styled placeholder popup UI, deterministic build + pin verification tests
+- [x] 01-02-PLAN.md -- Styled placeholder popup UI, deterministic build + pin verification tests
 
 ### Phase 2: Cryptographic Foundation
 **Goal**: User's keys are generated, derived, encrypted, and isolated correctly -- proven by test vectors
@@ -177,7 +177,7 @@ Note: Phases 5, 6 both depend on Phase 4. Phases 7, 8 depend on 4+6. Phase 9 dep
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Build & Extension Scaffold | 1/2 | In progress | - |
+| 1. Build & Extension Scaffold | 2/2 | Complete | 2026-03-01 |
 | 2. Cryptographic Foundation | 0/TBD | Not started | - |
 | 3. Wallet Core UI & Lifecycle | 0/TBD | Not started | - |
 | 4. ETH Transactions | 0/TBD | Not started | - |
