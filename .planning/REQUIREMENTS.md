@@ -145,86 +145,86 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | — | Pending |
-| SEC-02 | — | Pending |
-| SEC-03 | — | Pending |
-| SEC-04 | — | Pending |
-| SEC-05 | — | Pending |
-| SEC-06 | — | Pending |
-| SEC-07 | — | Pending |
-| SEC-08 | — | Pending |
-| SEC-09 | — | Pending |
-| SEC-10 | — | Pending |
-| ACCT-01 | — | Pending |
-| ACCT-02 | — | Pending |
-| ACCT-03 | — | Pending |
-| TX-01 | — | Pending |
-| TX-02 | — | Pending |
-| TX-03 | — | Pending |
-| TX-04 | — | Pending |
-| TX-05 | — | Pending |
-| TX-06 | — | Pending |
-| TX-07 | — | Pending |
-| TX-08 | — | Pending |
-| TX-09 | — | Pending |
-| TX-10 | — | Pending |
-| TX-11 | — | Pending |
-| TX-12 | — | Pending |
-| TX-13 | — | Pending |
-| TX-14 | — | Pending |
-| TX-15 | — | Pending |
-| TX-16 | — | Pending |
-| DAPP-01 | — | Pending |
-| DAPP-02 | — | Pending |
-| DAPP-03 | — | Pending |
-| DAPP-04 | — | Pending |
-| DAPP-05 | — | Pending |
-| DAPP-06 | — | Pending |
-| DAPP-07 | — | Pending |
-| DAPP-08 | — | Pending |
-| DAPP-09 | — | Pending |
-| DAPP-10 | — | Pending |
-| DAPP-11 | — | Pending |
-| RT-01 | — | Pending |
-| RT-02 | — | Pending |
-| RT-03 | — | Pending |
-| RT-04 | — | Pending |
-| RT-05 | — | Pending |
-| RT-06 | — | Pending |
-| RT-07 | — | Pending |
-| RT-08 | — | Pending |
-| RT-09 | — | Pending |
-| TOK-01 | — | Pending |
-| TOK-02 | — | Pending |
-| TOK-03 | — | Pending |
-| TOK-04 | — | Pending |
-| TOK-05 | — | Pending |
-| HIST-01 | — | Pending |
-| HIST-02 | — | Pending |
-| HIST-03 | — | Pending |
-| SET-01 | — | Pending |
-| SET-02 | — | Pending |
-| SET-03 | — | Pending |
-| SET-04 | — | Pending |
-| SET-05 | — | Pending |
-| BUILD-01 | — | Pending |
-| BUILD-02 | — | Pending |
-| BUILD-03 | — | Pending |
-| BUILD-04 | — | Pending |
-| BUILD-05 | — | Pending |
-| BUILD-06 | — | Pending |
-| TEST-01 | — | Pending |
-| TEST-02 | — | Pending |
-| TEST-03 | — | Pending |
-| TEST-04 | — | Pending |
-| TEST-05 | — | Pending |
-| TEST-06 | — | Pending |
+| SEC-01 | Phase 2 | Pending |
+| SEC-02 | Phase 2 | Pending |
+| SEC-03 | Phase 2 | Pending |
+| SEC-04 | Phase 2 | Pending |
+| SEC-05 | Phase 2 | Pending |
+| SEC-06 | Phase 2 | Pending |
+| SEC-07 | Phase 2 | Pending |
+| SEC-08 | Phase 3 | Pending |
+| SEC-09 | Phase 3 | Pending |
+| SEC-10 | Phase 2 | Pending |
+| ACCT-01 | Phase 2 | Pending |
+| ACCT-02 | Phase 3 | Pending |
+| ACCT-03 | Phase 3 | Pending |
+| TX-01 | Phase 4 | Pending |
+| TX-02 | Phase 4 | Pending |
+| TX-03 | Phase 4 | Pending |
+| TX-04 | Phase 4 | Pending |
+| TX-05 | Phase 4 | Pending |
+| TX-06 | Phase 4 | Pending |
+| TX-07 | Phase 4 | Pending |
+| TX-08 | Phase 4 | Pending |
+| TX-09 | Phase 4 | Pending |
+| TX-10 | Phase 7 | Pending |
+| TX-11 | Phase 7 | Pending |
+| TX-12 | Phase 7 | Pending |
+| TX-13 | Phase 7 | Pending |
+| TX-14 | Phase 7 | Pending |
+| TX-15 | Phase 4 | Pending |
+| TX-16 | Phase 4 | Pending |
+| DAPP-01 | Phase 5 | Pending |
+| DAPP-02 | Phase 5 | Pending |
+| DAPP-03 | Phase 5 | Pending |
+| DAPP-04 | Phase 5 | Pending |
+| DAPP-05 | Phase 5 | Pending |
+| DAPP-06 | Phase 5 | Pending |
+| DAPP-07 | Phase 5 | Pending |
+| DAPP-08 | Phase 5 | Pending |
+| DAPP-09 | Phase 5 | Pending |
+| DAPP-10 | Phase 5 | Pending |
+| DAPP-11 | Phase 5 | Pending |
+| RT-01 | Phase 6 | Pending |
+| RT-02 | Phase 6 | Pending |
+| RT-03 | Phase 6 | Pending |
+| RT-04 | Phase 6 | Pending |
+| RT-05 | Phase 6 | Pending |
+| RT-06 | Phase 6 | Pending |
+| RT-07 | Phase 6 | Pending |
+| RT-08 | Phase 9 | Pending |
+| RT-09 | Phase 9 | Pending |
+| TOK-01 | Phase 8 | Pending |
+| TOK-02 | Phase 8 | Pending |
+| TOK-03 | Phase 8 | Pending |
+| TOK-04 | Phase 8 | Pending |
+| TOK-05 | Phase 8 | Pending |
+| HIST-01 | Phase 9 | Pending |
+| HIST-02 | Phase 9 | Pending |
+| HIST-03 | Phase 9 | Pending |
+| SET-01 | Phase 3 | Pending |
+| SET-02 | Phase 3 | Pending |
+| SET-03 | Phase 3 | Pending |
+| SET-04 | Phase 3 | Pending |
+| SET-05 | Phase 3 | Pending |
+| BUILD-01 | Phase 1 | Pending |
+| BUILD-02 | Phase 1 | Pending |
+| BUILD-03 | Phase 1 | Pending |
+| BUILD-04 | Phase 1 | Pending |
+| BUILD-05 | Phase 1 | Pending |
+| BUILD-06 | Phase 1 | Pending |
+| TEST-01 | Phase 2 | Pending |
+| TEST-02 | Phase 2 | Pending |
+| TEST-03 | Phase 4 | Pending |
+| TEST-04 | Phase 4 | Pending |
+| TEST-05 | Phase 5 | Pending |
+| TEST-06 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 62 total
-- Mapped to phases: 0
-- Unmapped: 62
+- v1 requirements: 74 total
+- Mapped to phases: 74
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after initial definition*
+*Last updated: 2026-03-01 after roadmap creation*
