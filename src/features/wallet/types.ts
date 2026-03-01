@@ -34,6 +34,20 @@ export interface KeyPair {
   path: string; // derivation path
 }
 
+// Lockout state -- persisted to chrome.storage.session
+export interface LockoutState {
+  failedAttempts: number;
+  lockedUntil: number; // timestamp ms, 0 = not locked
+}
+
+// Lockout manager returned by createLockoutManager()
+export interface LockoutManager {
+  checkLockout(): { locked: boolean; remainingMs: number };
+  recordFailure(): void;
+  reset(): void;
+  serialize(): LockoutState;
+}
+
 // Message types -- popup sends to background
 export type WalletMessage =
   | { type: 'wallet:create'; password: string; strength?: 128 | 256 }
