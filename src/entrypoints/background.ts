@@ -120,6 +120,8 @@ export async function handleWalletMessage(msg: WalletMessage): Promise<WalletRes
         return await handleLock();
       case 'wallet:getAccounts':
         return await handleGetAccounts();
+      case 'wallet:getLockoutStatus':
+        return handleGetLockoutStatus();
       case 'wallet:deriveAccount':
         return await handleDeriveAccount(msg.index);
       default:
@@ -249,6 +251,17 @@ async function handleGetAccounts(): Promise<WalletResponse> {
     return { type: 'wallet:error', error: 'Wallet is locked' };
   }
   return { type: 'wallet:accounts', accounts: session.accounts };
+}
+
+function handleGetLockoutStatus(): WalletResponse {
+  const { locked, remainingMs } = lockout.checkLockout();
+  const state = lockout.serialize();
+  return {
+    type: 'wallet:lockoutStatus',
+    locked,
+    remainingMs,
+    failedAttempts: state.failedAttempts,
+  };
 }
 
 async function handleDeriveAccount(index: number): Promise<WalletResponse> {

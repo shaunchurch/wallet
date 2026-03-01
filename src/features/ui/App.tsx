@@ -1,7 +1,6 @@
-import { type JSX, useEffect } from 'react';
+import { useEffect } from 'react';
 import { type Screen, useWalletStore } from '../wallet/store';
 import { OnboardingProvider } from './OnboardingContext';
-import { ThemeProvider } from './ThemeProvider';
 import { AboutScreen } from './screens/AboutScreen';
 import { ConfirmSeedScreen } from './screens/ConfirmSeedScreen';
 import { CreatePasswordScreen } from './screens/CreatePasswordScreen';
@@ -13,8 +12,9 @@ import { ReceiveScreen } from './screens/ReceiveScreen';
 import { SeedPhraseScreen } from './screens/SeedPhraseScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { WelcomeScreen } from './screens/WelcomeScreen';
+import { ThemeProvider } from './ThemeProvider';
 
-const screens: Record<Screen, () => JSX.Element> = {
+const screens: Record<Screen, React.ComponentType> = {
   loading: LoadingScreen,
   welcome: WelcomeScreen,
   'create-password': CreatePasswordScreen,

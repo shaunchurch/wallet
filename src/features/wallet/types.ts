@@ -59,6 +59,7 @@ export type WalletMessage =
   | { type: 'wallet:unlock'; password: string }
   | { type: 'wallet:lock' }
   | { type: 'wallet:getAccounts' }
+  | { type: 'wallet:getLockoutStatus' }
   | { type: 'wallet:deriveAccount'; index: number };
 
 // Response types -- background sends back
@@ -70,4 +71,10 @@ export type WalletResponse =
   | { type: 'wallet:locked' }
   | { type: 'wallet:accounts'; accounts: DerivedAccount[] }
   | { type: 'wallet:derived'; account: DerivedAccount }
+  | {
+      type: 'wallet:lockoutStatus';
+      locked: boolean;
+      remainingMs: number;
+      failedAttempts: number;
+    }
   | { type: 'wallet:error'; error: string };
