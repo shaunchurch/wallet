@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T16:09:23.557Z"
+last_updated: "2026-03-01T21:59:10.249Z"
 progress:
-  total_phases: 3
+  total_phases: 4
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 11
+  completed_plans: 9
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** Transactions confirm instantly and balances update in real time. The fastest chain gets the fastest wallet.
-**Current focus:** Phase 4 planning in progress
+**Current focus:** Phase 4 ETH Transactions -- executing plans
 
 ## Current Position
 
-Phase: 4 of 9 (ETH Transactions) -- PLANNING
-Plan: 0 of TBD in current phase
-Status: Context gathered (04-CONTEXT.md), planning next
-Last activity: 2026-03-01 -- Phase 4 context discussion complete
+Phase: 4 of 9 (ETH Transactions) -- EXECUTING
+Plan: 1 of 3 in current phase (04-01 complete)
+Status: 04-01 complete (tx backend), 04-02 next
+Last activity: 2026-03-01 -- Plan 04-01 executed
 
-Progress: [████░░░░░░] 33%
+Progress: [██████░░░░] 38%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 5min
-- Total execution time: 0.72 hours
+- Total plans completed: 9
+- Average duration: 7min
+- Total execution time: 1.07 hours
 
 **By Phase:**
 
@@ -43,10 +43,11 @@ Progress: [████░░░░░░] 33%
 | 01 | 2 | 12min | 6min |
 | 02 | 3 | 14min | 5min |
 | 03 | 3 | 17min | 6min |
+| 04 | 1 | 21min | 21min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03(3m), 03-01(5m), 03-02(5m), 03-03(7m)
-- Trend: steady ~5min/plan
+- Last 5 plans: 03-01(5m), 03-02(5m), 03-03(7m), 04-01(21m)
+- Trend: 04-01 larger scope (2 tasks, 12 files, new lib)
 
 *Updated after each plan completion*
 
@@ -86,6 +87,11 @@ Recent decisions affecting current work:
 - 03-03: SeedExportModal 3-step state machine, mnemonic in component-local state only
 - 03-03: Password re-entry for seed export separate from unlock (intent separation)
 - 03-03: chrome.alarms mock added to test infrastructure
+- [Phase 04]: 04-01: All BigInt values as 0x hex strings across message boundary (JSON can't serialize BigInt)
+- [Phase 04]: 04-01: realtime_sendRawTransaction first with 10s timeout, fallback to eth_sendRawTransaction + poll
+- [Phase 04]: 04-01: Recent addresses deduped by lowercase, capped at 10, in chrome.storage.local
+- [Phase 04]: 04-01: Transaction.prepare() + signBy() for EIP-1559 Type 2 via micro-eth-signer
+- [Phase 04]: 04-01: eth_gasPrice as baseFee proxy (megaETH returns effective gas price)
 
 ### Pending Todos
 
@@ -98,5 +104,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Phase 4 planning (04-CONTEXT.md written)
+Stopped at: Completed 04-01-PLAN.md (tx backend)
 Resume file: None
