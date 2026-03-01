@@ -50,12 +50,12 @@ Plans:
   3. Vault encrypts with PBKDF2 (600k+ iterations) + AES-256-GCM; decrypt-after-encrypt round-trip matches original for edge-case passwords (empty, unicode, 1000+ chars)
   4. Encrypted vault persists in chrome.storage.local; decrypted key only in chrome.storage.session while unlocked
   5. Grep of entire codebase finds zero paths where private key bytes leave background service worker context
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
+- [x] 02-01-PLAN.md -- Crypto deps, BIP-39/BIP-44 modules, address derivation, test vectors
+- [ ] 02-02-PLAN.md -- PBKDF2 + AES-256-GCM vault encryption, progressive lockout, round-trip tests
+- [ ] 02-03-PLAN.md -- Background message handlers, chrome.storage integration, key isolation audit
 
 ### Phase 3: Wallet Core UI & Lifecycle
 **Goal**: User can create or import a wallet, see their address, manage accounts, and lock/unlock with auto-timeout
@@ -178,7 +178,7 @@ Note: Phases 5, 6 both depend on Phase 4. Phases 7, 8 depend on 4+6. Phase 9 dep
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Build & Extension Scaffold | 2/2 | Complete | 2026-03-01 |
-| 2. Cryptographic Foundation | 0/TBD | Not started | - |
+| 2. Cryptographic Foundation | 1/3 | In progress | - |
 | 3. Wallet Core UI & Lifecycle | 0/TBD | Not started | - |
 | 4. ETH Transactions | 0/TBD | Not started | - |
 | 5. Dapp Provider & Connectivity | 0/TBD | Not started | - |

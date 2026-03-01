@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-01T12:52:08.267Z"
+status: in-progress
+last_updated: "2026-03-01T13:42:00Z"
 progress:
-  total_phases: 1
+  total_phases: 9
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 3
+  completed_plans: 3
 ---
 
 # Project State
@@ -18,32 +18,33 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** Transactions confirm instantly and balances update in real time. The fastest chain gets the fastest wallet.
-**Current focus:** Phase 1: Build & Extension Scaffold
+**Current focus:** Phase 2: Cryptographic Foundation
 
 ## Current Position
 
-Phase: 1 of 9 (Build & Extension Scaffold) -- COMPLETE
-Plan: 2 of 2 in current phase
-Status: Phase 1 complete, ready for Phase 2
-Last activity: 2026-03-01 -- Completed 01-02 styled popup UI + build tests
+Phase: 2 of 9 (Cryptographic Foundation)
+Plan: 1 of 3 in current phase
+Status: 02-01 complete, continuing to 02-02
+Last activity: 2026-03-01 -- Completed 02-01 crypto deps + BIP-39/BIP-44 modules
 
-Progress: [██░░░░░░░░] 11%
+Progress: [██░░░░░░░░] 17%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 6min
-- Total execution time: 0.20 hours
+- Total plans completed: 3
+- Average duration: 7min
+- Total execution time: 0.33 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 2 | 12min | 6min |
+| 02 | 1 | 8min | 8min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01(4m), 01-02(8m)
+- Last 5 plans: 01-01(4m), 01-02(8m), 02-01(8m)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -63,6 +64,9 @@ Recent decisions affecting current work:
 - 01-02: Tailwind v4 @custom-variant for class-based dark mode (not media query)
 - 01-02: Manual shadcn button copy (CLI init incompatible with esbuild)
 - 01-02: SHA-256 recursive dir hashing for deterministic build verification
+- 02-01: @scure/bip39 v2 mnemonicToSeed is single-arg (no passphrase); manual PBKDF2 for Trezor vector verification
+- 02-01: Noble/scure subpath imports require .js extension in exports map
+- 02-01: 'as string' cast pattern over non-null assertions for biome lint compliance
 
 ### Pending Todos
 
@@ -75,5 +79,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None

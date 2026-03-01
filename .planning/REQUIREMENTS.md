@@ -9,10 +9,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Key Management & Security
 
-- [ ] **SEC-01**: User can generate new wallet with BIP-39 seed phrase (12 words default, 24 optional)
+- [x] **SEC-01**: User can generate new wallet with BIP-39 seed phrase (12 words default, 24 optional)
 - [ ] **SEC-02**: User sees seed phrase exactly once during creation with unmissable backup warning
 - [ ] **SEC-03**: User must confirm seed phrase (select words in order) before wallet is usable
-- [ ] **SEC-04**: User can import existing wallet via seed phrase entry
+- [x] **SEC-04**: User can import existing wallet via seed phrase entry
 - [ ] **SEC-05**: User sets password that encrypts vault via PBKDF2 (600k+ iterations) + AES-256-GCM
 - [ ] **SEC-06**: Encrypted vault stored in chrome.storage.local; decrypted key in chrome.storage.session only while unlocked
 - [ ] **SEC-07**: Private keys never leave background service worker — enforced across all code paths
@@ -22,7 +22,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Account Management
 
-- [ ] **ACCT-01**: Wallet derives primary account via BIP-44 path m/44'/60'/0'/0/0
+- [x] **ACCT-01**: Wallet derives primary account via BIP-44 path m/44'/60'/0'/0/0
 - [ ] **ACCT-02**: User can derive additional accounts (incrementing last index)
 - [ ] **ACCT-03**: User can view account address with copy-to-clipboard and QR code
 
@@ -104,7 +104,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Testing
 
-- [ ] **TEST-01**: Cryptographic correctness validated against published BIP-39/BIP-44/secp256k1 test vectors
+- [x] **TEST-01**: Cryptographic correctness validated against published BIP-39/BIP-44/secp256k1 test vectors
 - [ ] **TEST-02**: Encryption round-trip test (encrypt vault, decrypt, verify match) with edge-case passwords
 - [ ] **TEST-03**: Transaction serialization validated against known RLP test vectors (Type 2)
 - [ ] **TEST-04**: Gas estimation floor test: no tx submitted with gas < 60,000
@@ -145,17 +145,17 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Phase 2 | Pending |
+| SEC-01 | Phase 2 | Complete |
 | SEC-02 | Phase 2 | Pending |
 | SEC-03 | Phase 2 | Pending |
-| SEC-04 | Phase 2 | Pending |
+| SEC-04 | Phase 2 | Complete |
 | SEC-05 | Phase 2 | Pending |
 | SEC-06 | Phase 2 | Pending |
 | SEC-07 | Phase 2 | Pending |
 | SEC-08 | Phase 3 | Pending |
 | SEC-09 | Phase 3 | Pending |
 | SEC-10 | Phase 2 | Pending |
-| ACCT-01 | Phase 2 | Pending |
+| ACCT-01 | Phase 2 | Complete |
 | ACCT-02 | Phase 3 | Pending |
 | ACCT-03 | Phase 3 | Pending |
 | TX-01 | Phase 4 | Pending |
@@ -213,7 +213,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | BUILD-04 | Phase 1 | Complete |
 | BUILD-05 | Phase 1 | Complete |
 | BUILD-06 | Phase 1 | Complete |
-| TEST-01 | Phase 2 | Pending |
+| TEST-01 | Phase 2 | Complete |
 | TEST-02 | Phase 2 | Pending |
 | TEST-03 | Phase 4 | Pending |
 | TEST-04 | Phase 4 | Pending |
