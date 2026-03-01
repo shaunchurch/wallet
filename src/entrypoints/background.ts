@@ -70,6 +70,23 @@ async function removePendingCreation(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Derived indices persistence (survives lock/unlock cycles)
+// ---------------------------------------------------------------------------
+
+async function loadDerivedIndices(): Promise<number[]> {
+  const result = await chrome.storage.local.get('derivedIndices');
+  return Array.isArray(result.derivedIndices) ? (result.derivedIndices as number[]) : [0];
+}
+
+async function saveDerivedIndices(indices: number[]): Promise<void> {
+  await chrome.storage.local.set({ derivedIndices: indices });
+}
+
+async function clearDerivedIndices(): Promise<void> {
+  await chrome.storage.local.remove('derivedIndices');
+}
+
+// ---------------------------------------------------------------------------
 // Lockout manager (survives SW restarts via storage.session)
 // ---------------------------------------------------------------------------
 
@@ -154,6 +171,9 @@ async function handleCreate(password: string, strength?: 128 | 256): Promise<Wal
     accounts: [account],
   });
 
+  // Clear stale derived indices from any previous wallet
+  await clearDerivedIndices();
+
   return { type: 'wallet:created', address: account.address, mnemonic };
 }
 
@@ -202,6 +222,9 @@ async function handleImport(password: string, mnemonic: string): Promise<WalletR
   await saveVault(vault);
   await cacheSession({ seed: bytesToHex(seed), accounts: [account] });
 
+  // Clear stale derived indices from any previous wallet
+  await clearDerivedIndices();
+
   return { type: 'wallet:imported', address: account.address };
 }
 
@@ -232,11 +255,23 @@ async function handleUnlock(password: string): Promise<WalletResponse> {
   await persistLockout();
 
   const seed = await mnemonicToSeed(plaintext.mnemonic);
-  const kp = deriveAccount(seed, 0);
-  const account = toDerivedAccount(kp, 0);
 
-  await cacheSession({ seed: bytesToHex(seed), accounts: [account] });
-  return { type: 'wallet:unlocked', address: account.address };
+  // Restore all previously-derived accounts
+  const indices = await loadDerivedIndices();
+  const accounts: DerivedAccount[] = [];
+  for (const idx of indices) {
+    const kp = deriveAccount(seed, idx);
+    accounts.push(toDerivedAccount(kp, idx));
+  }
+
+  // Ensure at least index 0
+  if (accounts.length === 0) {
+    const kp = deriveAccount(seed, 0);
+    accounts.push(toDerivedAccount(kp, 0));
+  }
+
+  await cacheSession({ seed: bytesToHex(seed), accounts });
+  return { type: 'wallet:unlocked', address: accounts[0]?.address as string };
 }
 
 async function handleLock(): Promise<WalletResponse> {
@@ -283,6 +318,13 @@ async function handleDeriveAccount(index: number): Promise<WalletResponse> {
   if (!exists) {
     session.accounts.push(account);
     await cacheSession(session);
+  }
+
+  // Persist derived index for restore on unlock
+  const indices = await loadDerivedIndices();
+  if (!indices.includes(index)) {
+    indices.push(index);
+    await saveDerivedIndices(indices);
   }
 
   return { type: 'wallet:derived', account };

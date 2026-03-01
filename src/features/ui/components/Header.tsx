@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Jazzicon } from '@/lib/jazzicon';
 import { useWalletStore } from '@/features/wallet/store';
+import { Jazzicon } from '@/lib/jazzicon';
 import { useTheme } from '../ThemeProvider';
 
 function truncateAddress(addr: string): string {
@@ -9,23 +9,23 @@ function truncateAddress(addr: string): string {
 }
 
 const SUB_SCREENS = new Set(['receive', 'settings', 'about']);
-const ONBOARDING_SCREENS = new Set([
-  'welcome',
-  'create-password',
-  'seed-phrase',
-  'confirm-seed',
-  'import-seed',
-  'import-password',
-  'lock',
-  'loading',
-]);
 
 function ThemeToggle() {
   const { theme, toggle } = useTheme();
   return (
     <Button variant="ghost" size="icon-sm" onClick={toggle} aria-label="Toggle theme">
       {theme === 'dark' ? (
-        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="size-4">
+        <svg
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-4"
+        >
           <circle cx={12} cy={12} r={5} />
           <line x1={12} y1={1} x2={12} y2={3} />
           <line x1={12} y1={21} x2={12} y2={23} />
@@ -37,7 +37,17 @@ function ThemeToggle() {
           <line x1={18.36} y1={5.64} x2={19.78} y2={4.22} />
         </svg>
       ) : (
-        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="size-4">
+        <svg
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-4"
+        >
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         </svg>
       )}
@@ -92,7 +102,17 @@ export function Header() {
     return (
       <header className="flex items-center justify-between border-b border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950">
         <Button variant="ghost" size="icon-sm" onClick={pop} aria-label="Go back">
-          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="size-4">
+          <svg
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="size-4"
+          >
             <line x1={19} y1={12} x2={5} y2={12} />
             <polyline points="12 19 5 12 12 5" />
           </svg>
