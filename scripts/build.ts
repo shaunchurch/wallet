@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync } from 'node:fs';
+import { cpSync, mkdirSync, rmSync } from 'node:fs';
 import * as esbuild from 'esbuild';
 import { postcssPlugin } from './postcss-plugin';
 
@@ -16,6 +16,7 @@ const common: esbuild.BuildOptions = {
   logLevel: 'info',
 };
 
+rmSync('dist', { recursive: true, force: true });
 mkdirSync('dist', { recursive: true });
 
 if (isWatch) {
