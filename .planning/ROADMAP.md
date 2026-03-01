@@ -34,11 +34,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. CSP blocks inline scripts, eval, Function, and remote code loading -- verified by Chrome DevTools errors on violations
   4. Two consecutive builds from same source produce identical output (byte-for-byte)
   5. package.json has zero `^` or `~` version specifiers; lockfile integrity check passes
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Project scaffold, configs, esbuild multi-bundle pipeline, entrypoints
+- [ ] 01-02-PLAN.md -- Styled placeholder popup UI, deterministic build + pin verification tests
 
 ### Phase 2: Cryptographic Foundation
 **Goal**: User's keys are generated, derived, encrypted, and isolated correctly -- proven by test vectors
