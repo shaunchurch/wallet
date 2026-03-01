@@ -23,8 +23,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Account Management
 
 - [x] **ACCT-01**: Wallet derives primary account via BIP-44 path m/44'/60'/0'/0/0
-- [ ] **ACCT-02**: User can derive additional accounts (incrementing last index)
-- [ ] **ACCT-03**: User can view account address with copy-to-clipboard and QR code
+- [x] **ACCT-02**: User can derive additional accounts (incrementing last index)
+- [x] **ACCT-03**: User can view account address with copy-to-clipboard and QR code
 
 ### Transactions
 
@@ -156,8 +156,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | SEC-09 | Phase 3 | Pending |
 | SEC-10 | Phase 2 | Complete |
 | ACCT-01 | Phase 2 | Complete |
-| ACCT-02 | Phase 3 | Pending |
-| ACCT-03 | Phase 3 | Pending |
+| ACCT-02 | Phase 3 | Complete |
+| ACCT-03 | Phase 3 | Complete |
 | TX-01 | Phase 4 | Pending |
 | TX-02 | Phase 4 | Pending |
 | TX-03 | Phase 4 | Pending |
