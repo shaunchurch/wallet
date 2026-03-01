@@ -48,6 +48,12 @@ export interface LockoutManager {
   serialize(): LockoutState;
 }
 
+// Recent address entry for send history
+export interface RecentAddress {
+  address: string;
+  timestamp: number;
+}
+
 // Message types -- popup sends to background
 export type WalletMessage =
   | { type: 'wallet:create'; password: string; strength?: 128 | 256 }
@@ -64,7 +70,12 @@ export type WalletMessage =
   | { type: 'wallet:exportSeedPhrase'; password: string }
   | { type: 'wallet:setAutoLockTimeout'; minutes: number }
   | { type: 'wallet:getAutoLockTimeout' }
-  | { type: 'wallet:heartbeat' };
+  | { type: 'wallet:heartbeat' }
+  | { type: 'wallet:getBalance'; accountIndex: number }
+  | { type: 'wallet:estimateGas'; to: string; value: string; accountIndex: number }
+  | { type: 'wallet:getFeeParams' }
+  | { type: 'wallet:getEthPrice' }
+  | { type: 'wallet:sendTransaction'; to: string; value: string; accountIndex: number };
 
 // Response types -- background sends back
 export type WalletResponse =
@@ -85,4 +96,31 @@ export type WalletResponse =
   | { type: 'wallet:autoLockTimeout'; minutes: number }
   | { type: 'wallet:settingsSaved' }
   | { type: 'wallet:heartbeatAck' }
+  | {
+      type: 'wallet:balance';
+      balanceWei: string;
+      balanceEth: string;
+    }
+  | {
+      type: 'wallet:gasEstimate';
+      gasLimit: string;
+      maxFeePerGas: string;
+      maxPriorityFeePerGas: string;
+      estimatedFeeWei: string;
+      estimatedFeeEth: string;
+    }
+  | {
+      type: 'wallet:feeParams';
+      baseFee: string;
+      priorityFee: string;
+      maxFeePerGas: string;
+    }
+  | { type: 'wallet:ethPrice'; usd: number }
+  | {
+      type: 'wallet:txResult';
+      success: boolean;
+      txHash: string;
+      explorerUrl: string;
+      error?: string;
+    }
   | { type: 'wallet:error'; error: string };

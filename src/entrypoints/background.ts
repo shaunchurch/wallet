@@ -8,10 +8,20 @@ import {
   isValidMnemonic,
   mnemonicToSeed,
 } from '@/features/wallet/crypto';
+import { getEthPrice } from '@/features/wallet/price';
+import {
+  estimateGas,
+  getExplorerTxUrl,
+  getFeeParams,
+  NETWORKS,
+  rpcCall,
+} from '@/features/wallet/rpc';
+import { buildAndSignTransaction, formatEth } from '@/features/wallet/tx';
 import type {
   DerivedAccount,
   LockoutManager,
   LockoutState,
+  RecentAddress,
   VaultBlob,
   VaultPlaintext,
   WalletMessage,
@@ -203,6 +213,16 @@ export async function handleWalletMessage(msg: WalletMessage): Promise<WalletRes
         return await handleGetAutoLockTimeout();
       case 'wallet:heartbeat':
         return await handleHeartbeat();
+      case 'wallet:getBalance':
+        return await handleGetBalance(msg.accountIndex);
+      case 'wallet:estimateGas':
+        return await handleEstimateGas(msg.to, msg.value, msg.accountIndex);
+      case 'wallet:getFeeParams':
+        return await handleGetFeeParams();
+      case 'wallet:getEthPrice':
+        return await handleGetEthPrice();
+      case 'wallet:sendTransaction':
+        return await handleSendTransaction(msg.to, msg.value, msg.accountIndex);
       default:
         return { type: 'wallet:error', error: 'Unknown message type' };
     }
@@ -463,6 +483,161 @@ async function handleHeartbeat(): Promise<WalletResponse> {
   }
   await resetAutoLockAlarm();
   return { type: 'wallet:heartbeatAck' };
+}
+
+// ---------------------------------------------------------------------------
+// Network preference helper
+// ---------------------------------------------------------------------------
+
+async function getNetworkPreference(): Promise<'mainnet' | 'testnet'> {
+  const result = await chrome.storage.local.get('network');
+  return result.network === 'testnet' ? 'testnet' : 'mainnet';
+}
+
+// ---------------------------------------------------------------------------
+// Recent addresses helper (TX-09)
+// ---------------------------------------------------------------------------
+
+async function saveRecentAddress(address: string): Promise<void> {
+  const result = await chrome.storage.local.get('recentAddresses');
+  const existing: RecentAddress[] = Array.isArray(result.recentAddresses)
+    ? (result.recentAddresses as RecentAddress[])
+    : [];
+  const filtered = existing.filter((r) => r.address.toLowerCase() !== address.toLowerCase());
+  const updated = [{ address, timestamp: Date.now() }, ...filtered].slice(0, 10);
+  await chrome.storage.local.set({ recentAddresses: updated });
+}
+
+// ---------------------------------------------------------------------------
+// Transaction handlers
+// ---------------------------------------------------------------------------
+
+async function handleGetBalance(accountIndex: number): Promise<WalletResponse> {
+  const session = await getSession();
+  if (!session) return { type: 'wallet:error', error: 'Wallet is locked' };
+  const network = await getNetworkPreference();
+  const account = session.accounts.find((a) => a.index === accountIndex);
+  if (!account) return { type: 'wallet:error', error: 'Account not found' };
+
+  const raw = await rpcCall(network, 'eth_getBalance', [account.address, 'latest']);
+  const balanceWei = BigInt(raw as string);
+  return {
+    type: 'wallet:balance',
+    balanceWei: `0x${balanceWei.toString(16)}`,
+    balanceEth: formatEth(balanceWei),
+  };
+}
+
+async function handleEstimateGas(
+  to: string,
+  valueHex: string,
+  accountIndex: number,
+): Promise<WalletResponse> {
+  const session = await getSession();
+  if (!session) return { type: 'wallet:error', error: 'Wallet is locked' };
+  const network = await getNetworkPreference();
+  const account = session.accounts.find((a) => a.index === accountIndex);
+  if (!account) return { type: 'wallet:error', error: 'Account not found' };
+
+  const value = BigInt(valueHex);
+  const [gasLimit, feeParams] = await Promise.all([
+    estimateGas(network, account.address, to, value),
+    getFeeParams(network),
+  ]);
+  const estimatedFeeWei = gasLimit * feeParams.maxFeePerGas;
+  return {
+    type: 'wallet:gasEstimate',
+    gasLimit: `0x${gasLimit.toString(16)}`,
+    maxFeePerGas: `0x${feeParams.maxFeePerGas.toString(16)}`,
+    maxPriorityFeePerGas: `0x${feeParams.priorityFee.toString(16)}`,
+    estimatedFeeWei: `0x${estimatedFeeWei.toString(16)}`,
+    estimatedFeeEth: formatEth(estimatedFeeWei),
+  };
+}
+
+async function handleGetFeeParams(): Promise<WalletResponse> {
+  const network = await getNetworkPreference();
+  const params = await getFeeParams(network);
+  return {
+    type: 'wallet:feeParams',
+    baseFee: `0x${params.baseFee.toString(16)}`,
+    priorityFee: `0x${params.priorityFee.toString(16)}`,
+    maxFeePerGas: `0x${params.maxFeePerGas.toString(16)}`,
+  };
+}
+
+async function handleGetEthPrice(): Promise<WalletResponse> {
+  const usd = await getEthPrice();
+  return { type: 'wallet:ethPrice', usd };
+}
+
+async function handleSendTransaction(
+  to: string,
+  valueHex: string,
+  accountIndex: number,
+): Promise<WalletResponse> {
+  const session = await getSession();
+  if (!session) return { type: 'wallet:error', error: 'Wallet is locked' };
+  const network = await getNetworkPreference();
+
+  // Derive full key pair (private key stays in this function scope)
+  const seed = hexToBytes(session.seed);
+  const kp = deriveAccount(seed, accountIndex);
+  const value = BigInt(valueHex);
+
+  try {
+    // Fetch nonce, fee params, gas estimate in parallel
+    const [nonceRaw, feeParams, gasLimit] = await Promise.all([
+      rpcCall(network, 'eth_getTransactionCount', [kp.address, 'pending']),
+      getFeeParams(network),
+      estimateGas(network, kp.address, to, value),
+    ]);
+    const nonce = BigInt(nonceRaw as string);
+
+    const { chainId } = NETWORKS[network];
+    const signedTx = buildAndSignTransaction({
+      to,
+      value,
+      nonce,
+      gasLimit,
+      maxFeePerGas: feeParams.maxFeePerGas,
+      maxPriorityFeePerGas: feeParams.priorityFee,
+      chainId,
+      privateKey: kp.privateKey,
+    });
+
+    // TX-07: Try realtime_sendRawTransaction first
+    let txHash: string;
+    try {
+      const receipt = await Promise.race([
+        rpcCall(network, 'realtime_sendRawTransaction', [signedTx]) as Promise<{
+          transactionHash: string;
+        }>,
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('realtime_timeout')), 10_000),
+        ),
+      ]);
+      txHash = (receipt as { transactionHash: string }).transactionHash;
+    } catch {
+      // TX-08: Fallback to standard send + poll
+      txHash = (await rpcCall(network, 'eth_sendRawTransaction', [signedTx])) as string;
+
+      // Poll for receipt (up to 10s, every 500ms)
+      for (let i = 0; i < 20; i++) {
+        const receipt = await rpcCall(network, 'eth_getTransactionReceipt', [txHash]);
+        if (receipt) break;
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+
+    // TX-09: Save recent address after success
+    await saveRecentAddress(to);
+    const explorerUrl = getExplorerTxUrl(network, txHash);
+    return { type: 'wallet:txResult', success: true, txHash, explorerUrl };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Transaction failed';
+    return { type: 'wallet:txResult', success: false, txHash: '', explorerUrl: '', error };
+  }
 }
 
 // ---------------------------------------------------------------------------
