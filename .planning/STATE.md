@@ -18,14 +18,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** Transactions confirm instantly and balances update in real time. The fastest chain gets the fastest wallet.
-**Current focus:** Phase 3 complete, ready for Phase 4
+**Current focus:** Phase 4 planning in progress
 
 ## Current Position
 
-Phase: 3 of 9 (Wallet Core UI & Lifecycle) -- COMPLETE
-Plan: 3 of 3 in current phase (03-03 done)
-Status: Phase 3 complete, ready for Phase 4
-Last activity: 2026-03-01 -- Completed 03-03 settings, auto-lock, seed export
+Phase: 4 of 9 (ETH Transactions) -- PLANNING
+Plan: 0 of TBD in current phase
+Status: Context gathered (04-CONTEXT.md), planning next
+Last activity: 2026-03-01 -- Phase 4 context discussion complete
 
 Progress: [████░░░░░░] 33%
 
@@ -98,5 +98,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 03-03-PLAN.md (Phase 3 complete)
+Stopped at: Phase 4 planning (04-CONTEXT.md written)
 Resume file: None
