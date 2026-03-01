@@ -13,8 +13,8 @@ MegaWallet ships in 9 phases following the dependency graph: build scaffold, the
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Build & Extension Scaffold** - MV3 manifest, esbuild multi-bundle pipeline, strict CSP, deterministic builds
-- [ ] **Phase 2: Cryptographic Foundation** - BIP-39/44 key derivation, AES-256-GCM vault, key isolation, crypto TDD
-- [ ] **Phase 3: Wallet Core UI & Lifecycle** - Create/import flow, lock/unlock, accounts, settings, service worker persistence
+- [x] **Phase 2: Cryptographic Foundation** - BIP-39/44 key derivation, AES-256-GCM vault, key isolation, crypto TDD
+- [x] **Phase 3: Wallet Core UI & Lifecycle** - Create/import flow, lock/unlock, accounts, settings, service worker persistence
 - [ ] **Phase 4: ETH Transactions** - Send/receive ETH with megaETH gas (60k min), Type 2 tx, realtime send, confirmation UI
 - [ ] **Phase 5: Dapp Provider & Connectivity** - EIP-1193/6963 injection, content script relay, signing methods, permissions
 - [ ] **Phase 6: Real-Time Streaming** - WebSocket stateChanges, live balances, keepalive, reconnection, network health
@@ -54,8 +54,8 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md -- Crypto deps, BIP-39/BIP-44 modules, address derivation, test vectors
-- [ ] 02-02-PLAN.md -- PBKDF2 + AES-256-GCM vault encryption, progressive lockout, round-trip tests
-- [ ] 02-03-PLAN.md -- Background message handlers, chrome.storage integration, key isolation audit
+- [x] 02-02-PLAN.md -- PBKDF2 + AES-256-GCM vault encryption, progressive lockout, round-trip tests
+- [x] 02-03-PLAN.md -- Background message handlers, chrome.storage integration, key isolation audit
 
 ### Phase 3: Wallet Core UI & Lifecycle
 **Goal**: User can create or import a wallet, see their address, manage accounts, and lock/unlock with auto-timeout
@@ -70,9 +70,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- Zustand store, navigation, onboarding screens (welcome/create/import), lock screen, popup init
-- [ ] 03-02-PLAN.md -- Main screen (Phantom-style), sidebar account switcher, receive/QR, jazzicon, header rework
-- [ ] 03-03-PLAN.md -- Settings, auto-lock (chrome.alarms), seed export, network switcher, about page
+- [x] 03-01-PLAN.md -- Zustand store, navigation, onboarding screens (welcome/create/import), lock screen, popup init
+- [x] 03-02-PLAN.md -- Main screen (Phantom-style), sidebar account switcher, receive/QR, jazzicon, header rework
+- [x] 03-03-PLAN.md -- Settings, auto-lock (chrome.alarms), seed export, network switcher, about page
 
 ### Phase 4: ETH Transactions
 **Goal**: User can send and receive ETH on megaETH with correct gas estimation, instant confirmation, and full transaction lifecycle
@@ -84,12 +84,12 @@ Plans:
   3. Gas estimation always calls megaETH RPC eth_estimateGas, enforces 60k minimum floor, applies 20% buffer -- no tx ever submitted with gas < 60,000
   4. Transaction submits via realtime_sendRawTransaction and result (success/failure + explorer link) appears within seconds; falls back to standard send + poll on 10s timeout
   5. Transaction serialization (EIP-1559 Type 2 + RLP) passes published test vectors; sequential transactions use sequential nonces
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
+- [ ] 04-01-PLAN.md -- Install micro-eth-signer, RPC provider, gas estimation, tx construction/signing, price module, manifest CSP, background handlers
+- [ ] 04-02-PLAN.md -- TDD: tx serialization test vectors, gas floor enforcement, sequential nonce correctness
+- [ ] 04-03-PLAN.md -- Send flow UI (4 screens: recipient, amount, confirm, result), BalanceDisplay, store updates, App.tsx wiring
 
 ### Phase 5: Dapp Provider & Connectivity
 **Goal**: Dapps can discover the wallet, connect with user approval, and send transactions or request signatures through standard Ethereum provider API
@@ -178,9 +178,9 @@ Note: Phases 5, 6 both depend on Phase 4. Phases 7, 8 depend on 4+6. Phase 9 dep
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Build & Extension Scaffold | 2/2 | Complete | 2026-03-01 |
-| 2. Cryptographic Foundation | 1/3 | In progress | - |
-| 3. Wallet Core UI & Lifecycle | 0/TBD | Not started | - |
-| 4. ETH Transactions | 0/TBD | Not started | - |
+| 2. Cryptographic Foundation | 3/3 | Complete | 2026-03-01 |
+| 3. Wallet Core UI & Lifecycle | 3/3 | Complete | 2026-03-01 |
+| 4. ETH Transactions | 0/TBD | Planning | - |
 | 5. Dapp Provider & Connectivity | 0/TBD | Not started | - |
 | 6. Real-Time Streaming | 0/TBD | Not started | - |
 | 7. Transaction Intelligence | 0/TBD | Not started | - |
