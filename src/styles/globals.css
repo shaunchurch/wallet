@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@source "../";
+
+@theme {
+  --color-accent: oklch(0.541 0.281 293.009);
+  --font-sans: "Inter", system-ui, sans-serif;
+}

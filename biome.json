@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
   "root": true,
   "vcs": {
     "enabled": true,
@@ -8,8 +8,7 @@
     "defaultBranch": "main"
   },
   "files": {
-    "includes": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts", "tests/**/*.ts"],
-    "ignore": ["dist/**", "node_modules/**"]
+    "includes": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts", "tests/**/*.ts"]
   },
   "formatter": {
     "enabled": true,
@@ -43,7 +42,7 @@
   },
   "overrides": [
     {
-      "include": ["*.config.ts", "scripts/**"],
+      "includes": ["*.config.ts", "scripts/**"],
       "linter": {
         "rules": {
           "style": {
