@@ -11,6 +11,10 @@ import { LockScreen } from './screens/LockScreen';
 import { MainScreen } from './screens/MainScreen';
 import { ReceiveScreen } from './screens/ReceiveScreen';
 import { SeedPhraseScreen } from './screens/SeedPhraseScreen';
+import { SendAmountScreen } from './screens/SendAmountScreen';
+import { SendConfirmScreen } from './screens/SendConfirmScreen';
+import { SendRecipientScreen } from './screens/SendRecipientScreen';
+import { SendResultScreen } from './screens/SendResultScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { WelcomeScreen } from './screens/WelcomeScreen';
 import { ThemeProvider } from './ThemeProvider';
@@ -28,6 +32,10 @@ const screens: Record<Screen, React.ComponentType> = {
   lock: LockScreen,
   settings: SettingsScreen,
   about: AboutScreen,
+  'send-recipient': SendRecipientScreen,
+  'send-amount': SendAmountScreen,
+  'send-confirm': SendConfirmScreen,
+  'send-result': SendResultScreen,
 };
 
 function LoadingScreen() {

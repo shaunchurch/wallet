@@ -1,5 +1,5 @@
 import { ActionButtons } from '../components/ActionButtons';
-import { BalancePlaceholder } from '../components/BalancePlaceholder';
+import { BalanceDisplay } from '../components/BalanceDisplay';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 
@@ -8,7 +8,7 @@ export function MainScreen() {
     <>
       <Header />
       <div className="flex flex-1 flex-col overflow-y-auto">
-        <BalancePlaceholder />
+        <BalanceDisplay />
         <ActionButtons />
 
         {/* Token area -- placeholder for Phase 8 */}

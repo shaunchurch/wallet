@@ -14,7 +14,11 @@ export type Screen =
   | 'receive'
   | 'lock'
   | 'settings'
-  | 'about';
+  | 'about'
+  | 'send-recipient'
+  | 'send-amount'
+  | 'send-confirm'
+  | 'send-result';
 
 interface WalletStore {
   // Navigation
@@ -33,6 +37,28 @@ interface WalletStore {
   autoLockMinutes: number;
   sidebarOpen: boolean;
   accountNames: Record<number, string>;
+
+  // Send flow state
+  sendTo: string;
+  sendAmountWei: string;
+  sendAmountEth: string;
+  sendResult: {
+    success: boolean;
+    txHash: string;
+    explorerUrl: string;
+    error?: string;
+  } | null;
+  setSendTo: (to: string) => void;
+  setSendAmount: (wei: string, eth: string) => void;
+  setSendResult: (
+    result: {
+      success: boolean;
+      txHash: string;
+      explorerUrl: string;
+      error?: string;
+    } | null,
+  ) => void;
+  clearSendState: () => void;
 
   // Actions
   initialize: () => Promise<void>;
@@ -85,6 +111,16 @@ export const useWalletStore = create<WalletStore>()((set, get) => ({
   autoLockMinutes: 15,
   sidebarOpen: false,
   accountNames: {},
+
+  // Send flow state
+  sendTo: '',
+  sendAmountWei: '',
+  sendAmountEth: '',
+  sendResult: null,
+  setSendTo: (to) => set({ sendTo: to }),
+  setSendAmount: (wei, eth) => set({ sendAmountWei: wei, sendAmountEth: eth }),
+  setSendResult: (result) => set({ sendResult: result }),
+  clearSendState: () => set({ sendTo: '', sendAmountWei: '', sendAmountEth: '', sendResult: null }),
 
   // Actions
   initialize: async () => {

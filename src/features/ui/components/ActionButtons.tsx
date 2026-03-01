@@ -31,10 +31,10 @@ export function ActionButtons() {
 
   return (
     <div className="flex justify-center gap-8 py-4">
-      {/* Send -- disabled placeholder */}
+      {/* Send */}
       <ActionButton
-        disabled
         label="Send"
+        onClick={() => push('send-recipient')}
         icon={
           <svg
             aria-hidden="true"

@@ -8,7 +8,15 @@ function truncateAddress(addr: string): string {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
-const SUB_SCREENS = new Set(['receive', 'settings', 'about']);
+const SUB_SCREENS = new Set([
+  'receive',
+  'settings',
+  'about',
+  'send-recipient',
+  'send-amount',
+  'send-confirm',
+  'send-result',
+]);
 
 function ThemeToggle() {
   const { theme, toggle } = useTheme();
@@ -78,6 +86,10 @@ const SCREEN_TITLES: Record<string, string> = {
   receive: 'Receive',
   settings: 'Settings',
   about: 'About',
+  'send-recipient': 'Send',
+  'send-amount': 'Amount',
+  'send-confirm': 'Confirm',
+  'send-result': 'Result',
 };
 
 export function Header() {

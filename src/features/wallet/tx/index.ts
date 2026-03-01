@@ -1,8 +1,2 @@
-export {
-  buildAndSignTransaction,
-  calculateMaxSend,
-  formatEth,
-  formatUsd,
-  parseEthToWei,
-  validateAddress,
-} from './build';
+export { buildAndSignTransaction, validateAddress } from './build';
+export { calculateMaxSend, formatEth, formatUsd, parseEthToWei } from './format';
