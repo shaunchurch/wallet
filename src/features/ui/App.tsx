@@ -1,8 +1,16 @@
+import { ActionButtons } from './components/ActionButtons';
+import { BalancePlaceholder } from './components/BalancePlaceholder';
+import { Header } from './components/Header';
+import { ThemeProvider } from './ThemeProvider';
+
 export function App() {
   return (
-    <div className="flex min-h-screen w-[360px] flex-col items-center justify-center bg-zinc-950 text-white">
-      <h1 className="text-2xl font-bold tracking-tight text-accent">megawallet</h1>
-      <p className="mt-2 text-sm text-zinc-400">The fastest wallet for the fastest chain</p>
-    </div>
+    <ThemeProvider>
+      <div className="flex h-[600px] w-[360px] flex-col overflow-hidden bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+        <Header />
+        <BalancePlaceholder />
+        <ActionButtons />
+      </div>
+    </ThemeProvider>
   );
 }
