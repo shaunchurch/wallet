@@ -1,10 +1,5 @@
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js';
-import type {
-  LockoutManager,
-  LockoutState,
-  VaultBlob,
-  VaultPlaintext,
-} from '../types';
+import type { LockoutManager, LockoutState, VaultBlob, VaultPlaintext } from '../types';
 
 const PBKDF2_ITERATIONS = 600_000;
 const SALT_BYTES = 16;
@@ -23,13 +18,7 @@ async function deriveKey(
   iterations: number,
 ): Promise<CryptoKey> {
   const encoded = new TextEncoder().encode(password.normalize('NFKD'));
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw',
-    encoded,
-    'PBKDF2',
-    false,
-    ['deriveKey'],
-  );
+  const keyMaterial = await crypto.subtle.importKey('raw', encoded, 'PBKDF2', false, ['deriveKey']);
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
@@ -56,11 +45,7 @@ export async function encryptVault(
   const iv = crypto.getRandomValues(new Uint8Array(IV_BYTES));
   const key = await deriveKey(password, salt, PBKDF2_ITERATIONS);
   const encoded = new TextEncoder().encode(JSON.stringify(plaintext));
-  const ciphertext = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
-    key,
-    encoded,
-  );
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
   return {
     version: 1,
     kdf: {
@@ -83,10 +68,7 @@ export async function encryptVault(
  * @throws Error('Incorrect password') on wrong password -- never exposes internals.
  * @throws Error('Unsupported vault version: N') on unknown version.
  */
-export async function decryptVault(
-  blob: VaultBlob,
-  password: string,
-): Promise<VaultPlaintext> {
+export async function decryptVault(blob: VaultBlob, password: string): Promise<VaultPlaintext> {
   if (blob.version !== 1) {
     throw new Error(`Unsupported vault version: ${blob.version}`);
   }
@@ -128,10 +110,7 @@ export function createLockoutManager(state?: LockoutState): LockoutManager {
     recordFailure(): void {
       failedAttempts++;
       if (failedAttempts >= 3) {
-        const delayIndex = Math.min(
-          failedAttempts - 3,
-          LOCKOUT_DELAYS.length - 1,
-        );
+        const delayIndex = Math.min(failedAttempts - 3, LOCKOUT_DELAYS.length - 1);
         const delay = LOCKOUT_DELAYS[delayIndex] as number;
         lockedUntil = Date.now() + delay;
       }

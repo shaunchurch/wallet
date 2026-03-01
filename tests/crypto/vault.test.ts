@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  createLockoutManager,
-  decryptVault,
-  encryptVault,
-} from '@/features/wallet/crypto/vault';
+import { createLockoutManager, decryptVault, encryptVault } from '@/features/wallet/crypto/vault';
 import type { VaultPlaintext } from '@/features/wallet/types';
 
 const SAMPLE_PLAINTEXT: VaultPlaintext = {
@@ -38,9 +34,7 @@ describe('vault encrypt/decrypt round-trip', () => {
 describe('vault wrong password', () => {
   it('throws on wrong password', async () => {
     const blob = await encryptVault(SAMPLE_PLAINTEXT, 'correct');
-    await expect(decryptVault(blob, 'wrong')).rejects.toThrow(
-      'Incorrect password',
-    );
+    await expect(decryptVault(blob, 'wrong')).rejects.toThrow('Incorrect password');
   });
 
   it('throws decrypting with empty when encrypted with non-empty', async () => {
@@ -50,9 +44,7 @@ describe('vault wrong password', () => {
 
   it('throws decrypting with non-empty when encrypted with empty', async () => {
     const blob = await encryptVault(SAMPLE_PLAINTEXT, '');
-    await expect(decryptVault(blob, 'x')).rejects.toThrow(
-      'Incorrect password',
-    );
+    await expect(decryptVault(blob, 'x')).rejects.toThrow('Incorrect password');
   });
 });
 
