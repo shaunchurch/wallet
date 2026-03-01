@@ -92,7 +92,7 @@ export function Jazzicon({ address, size = 32 }: { address: string; size?: numbe
   const colors = PALETTE.map((c) => shiftHue(c, hueShift));
   const bgIdx = Math.floor(rand() * colors.length);
   const bg = colors[bgIdx] as string;
-  const clipId = `jz-${seed}`;
+  const clipId = `jz-${seed}-${size}`;
 
   const rects = Array.from({ length: 4 }, () => {
     const color = colors[Math.floor(rand() * colors.length)] as string;
@@ -110,6 +110,7 @@ export function Jazzicon({ address, size = 32 }: { address: string; size?: numbe
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
+      style={{ width: size, height: size, flexShrink: 0 }}
       aria-hidden="true"
     >
       <defs>
