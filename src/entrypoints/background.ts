@@ -1283,28 +1283,21 @@ async function handleDappSimulate(txParams: {
 // ---------------------------------------------------------------------------
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  // Only accept messages from our own extension contexts
   if (sender.id !== chrome.runtime.id) return;
-  // Reject content script / inpage origins
+
+  // Dapp RPC from content scripts (web origin) — handle first, separate path
+  if (msg.type === 'dapp:rpc') {
+    handleDappRpc(msg as DappRpcRequest, sender.tab?.id).then(sendResponse);
+    return true;
+  }
+
+  // All other messages must come from extension popup (chrome-extension:// origin)
   if (sender.origin && !sender.origin.startsWith('chrome-extension://')) return;
 
   if (msg.type?.startsWith('wallet:') || msg.type?.startsWith('dapp:')) {
     handleWalletMessage(msg as WalletMessage).then(sendResponse);
-    return true; // async response
+    return true;
   }
-});
-
-// ---------------------------------------------------------------------------
-// Dapp RPC listener (separate from wallet listener)
-// ---------------------------------------------------------------------------
-
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  // Dapp messages come from content scripts -- same extension ID, but web origin
-  if (sender.id !== chrome.runtime.id) return;
-  if (msg.type !== 'dapp:rpc') return;
-
-  handleDappRpc(msg as DappRpcRequest, sender.tab?.id).then(sendResponse);
-  return true; // async response
 });
 
 // ---------------------------------------------------------------------------
