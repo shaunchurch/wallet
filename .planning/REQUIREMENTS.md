@@ -47,17 +47,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Dapp Connectivity
 
-- [ ] **DAPP-01**: Content script injects EIP-1193 compatible window.ethereum provider
-- [ ] **DAPP-02**: EIP-6963 multi-wallet discovery via event-based provider announcement
+- [x] **DAPP-01**: Content script injects EIP-1193 compatible window.ethereum provider
+- [x] **DAPP-02**: EIP-6963 multi-wallet discovery via event-based provider announcement
 - [ ] **DAPP-03**: eth_requestAccounts with user approval dialog for dapp connection
 - [ ] **DAPP-04**: eth_sendTransaction with full confirmation flow and simulation preview
 - [ ] **DAPP-05**: personal_sign with clear display of message content
 - [ ] **DAPP-06**: eth_signTypedData_v4 with structured data display; Permit signatures get extra warning
-- [ ] **DAPP-07**: eth_chainId, eth_accounts, net_version for chain/account queries
-- [ ] **DAPP-08**: wallet_switchEthereumChain — accept megaETH mainnet/testnet only, reject others with explanation
-- [ ] **DAPP-09**: eth_sign blocked by default with explanation; user can enable in advanced settings
-- [ ] **DAPP-10**: Provider validates all requests against whitelist of supported RPC methods
-- [ ] **DAPP-11**: No internal wallet state accessible from provider object
+- [x] **DAPP-07**: eth_chainId, eth_accounts, net_version for chain/account queries
+- [x] **DAPP-08**: wallet_switchEthereumChain — accept megaETH mainnet/testnet only, reject others with explanation
+- [x] **DAPP-09**: eth_sign blocked by default with explanation; user can enable in advanced settings
+- [x] **DAPP-10**: Provider validates all requests against whitelist of supported RPC methods
+- [x] **DAPP-11**: No internal wallet state accessible from provider object
 
 ### Real-Time Features
 
@@ -174,17 +174,17 @@ Deferred to future release. Tracked but not in current roadmap.
 | TX-14 | Phase 7 | Pending |
 | TX-15 | Phase 4 | Complete |
 | TX-16 | Phase 4 | Complete |
-| DAPP-01 | Phase 5 | Pending |
-| DAPP-02 | Phase 5 | Pending |
+| DAPP-01 | Phase 5 | Complete |
+| DAPP-02 | Phase 5 | Complete |
 | DAPP-03 | Phase 5 | Pending |
 | DAPP-04 | Phase 5 | Pending |
 | DAPP-05 | Phase 5 | Pending |
 | DAPP-06 | Phase 5 | Pending |
-| DAPP-07 | Phase 5 | Pending |
-| DAPP-08 | Phase 5 | Pending |
-| DAPP-09 | Phase 5 | Pending |
-| DAPP-10 | Phase 5 | Pending |
-| DAPP-11 | Phase 5 | Pending |
+| DAPP-07 | Phase 5 | Complete |
+| DAPP-08 | Phase 5 | Complete |
+| DAPP-09 | Phase 5 | Complete |
+| DAPP-10 | Phase 5 | Complete |
+| DAPP-11 | Phase 5 | Complete |
 | RT-01 | Phase 6 | Pending |
 | RT-02 | Phase 6 | Pending |
 | RT-03 | Phase 6 | Pending |

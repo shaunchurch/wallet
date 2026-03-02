@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-01T22:22:00Z"
+last_updated: "2026-03-02T09:34:00Z"
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 3
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 14
+  completed_plans: 12
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** Transactions confirm instantly and balances update in real time. The fastest chain gets the fastest wallet.
-**Current focus:** Phase 4 ETH Transactions -- executing plans
+**Current focus:** Phase 5 Dapp Provider & Connectivity -- executing plans
 
 ## Current Position
 
-Phase: 4 of 9 (ETH Transactions) -- COMPLETE
-Plan: 3 of 3 in current phase (all complete)
-Status: Phase 4 complete, ready for Phase 5
-Last activity: 2026-03-01 -- Plan 04-03 executed
+Phase: 5 of 9 (Dapp Provider & Connectivity)
+Plan: 1 of 3 in current phase (05-01 complete)
+Status: Executing Phase 5
+Last activity: 2026-03-02 -- Plan 05-01 executed
 
-Progress: [████████░░] 46%
+Progress: [█████████░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 8min
-- Total execution time: 1.59 hours
+- Total execution time: 1.66 hours
 
 **By Phase:**
 
@@ -44,10 +44,11 @@ Progress: [████████░░] 46%
 | 02 | 3 | 14min | 5min |
 | 03 | 3 | 17min | 6min |
 | 04 | 3 | 52min | 17min |
+| 05 | 1/3 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 03-03(7m), 04-01(21m), 04-02(4m), 04-03(27m)
-- Trend: 04-03 larger scope (13 files, 4 UI screens + balance display)
+- Last 5 plans: 04-01(21m), 04-02(4m), 04-03(27m), 05-01(4m)
+- Trend: 05-01 clean execution, 6 files, provider + relay chain
 
 *Updated after each plan completion*
 
@@ -97,6 +98,9 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-03: Pure formatters in tx/format.ts (no crypto deps) for popup-safe imports
 - [Phase 04]: 04-03: validateAddress imported from build.ts in popup (pulls micro-eth-signer, ~1.4mb popup bundle, acceptable)
 - [Phase 04]: 04-03: Send flow state (sendTo/sendAmountWei/sendResult) in zustand, cleared on flow exit
+- [Phase 05]: 05-01: export {} for TS module isolation in IIFE entrypoints (inpage, content)
+- [Phase 05]: 05-01: Separate chrome.runtime.onMessage listener for dapp:rpc (not mixed with wallet: handler)
+- [Phase 05]: 05-01: Provider frozen via Object.freeze -- _emit/_handleResponse callable through closure
 
 ### Pending Todos
 
@@ -108,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-01
-Stopped at: Completed 04-03-PLAN.md (send flow UI)
+Last session: 2026-03-02
+Stopped at: Completed 05-01-PLAN.md (dapp provider injection)
 Resume file: None

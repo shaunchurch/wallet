@@ -104,9 +104,9 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
-- [ ] 05-03: TBD
+- [x] 05-01-PLAN.md -- EIP-1193 provider injection, EIP-6963 discovery, content script relay, background dapp routing, RPC whitelist, connected sites storage
+- [ ] 05-02-PLAN.md -- Pending request queue, approval popup flow, signing handlers (personal_sign + signTypedData_v4), dapp tx execution, simulation
+- [ ] 05-03-PLAN.md -- Dapp UI screens (connect, sign, confirm, connections), connection indicator, Permit warnings, provider isolation test (TEST-05)
 
 ### Phase 6: Real-Time Streaming
 **Goal**: Balances update in real time and network health is visible -- the user sees megaETH's speed, not poll-and-refresh
@@ -181,7 +181,7 @@ Note: Phases 5, 6 both depend on Phase 4. Phases 7, 8 depend on 4+6. Phase 9 dep
 | 2. Cryptographic Foundation | 3/3 | Complete | 2026-03-01 |
 | 3. Wallet Core UI & Lifecycle | 3/3 | Complete | 2026-03-01 |
 | 4. ETH Transactions | 3/3 | Complete | 2026-03-01 |
-| 5. Dapp Provider & Connectivity | 0/TBD | Not started | - |
+| 5. Dapp Provider & Connectivity | 1/3 | In Progress | - |
 | 6. Real-Time Streaming | 0/TBD | Not started | - |
 | 7. Transaction Intelligence | 0/TBD | Not started | - |
 | 8. Token Ecosystem | 0/TBD | Not started | - |
