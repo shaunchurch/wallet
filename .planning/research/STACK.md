@@ -189,7 +189,7 @@ await esbuild.build({
 ```json
 {
   "manifest_version": 3,
-  "name": "MegaWallet",
+  "name": "Vibe Wallet",
   "version": "0.1.0",
   "action": { "default_popup": "popup.html" },
   "background": {

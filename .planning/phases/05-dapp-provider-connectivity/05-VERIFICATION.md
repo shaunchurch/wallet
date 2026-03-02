@@ -23,7 +23,7 @@ re_verification: false
 | 2 | Dapp can send transactions via eth_sendTransaction through full confirmation flow with simulation preview | VERIFIED | `DappConfirmScreen.tsx`: simulation via `dapp:simulate` + decoded calldata + editable gas + `dapp:executeTx`. `background.ts`: `handleDappExecuteTx` uses `buildAndSignTransaction` + realtime send |
 | 3 | Dapp can request personal_sign (plaintext) and eth_signTypedData_v4 (structured display, Permit warning); eth_sign blocked | VERIFIED | `DappSignScreen.tsx`: hex-to-UTF8 decode, JSON formatting for personal_sign; structured tree + Permit red banner for signTypedData. `background.ts`: `eip191Signer.sign` + `signTyped`. eth_sign returns 4200 by default |
 | 4 | Provider responds correctly to eth_chainId, eth_accounts, net_version; wallet_switchEthereumChain accepts megaETH chains only | VERIFIED | `background.ts` `handleDirectRpc`: eth_chainId returns hex, eth_accounts from connected site, net_version as string. wallet_switchEthereumChain accepts 4326/6343 only, rejects with 4902 |
-| 5 | No internal wallet state accessible from provider; content script messages never contain key material | VERIFIED | `inpage.ts`: `Object.freeze(megaWalletProvider)`, mutable state in closures, no isUnlocked/selectedAddress. TEST-05 passes (4/4 tests). Types file has no key material fields |
+| 5 | No internal wallet state accessible from provider; content script messages never contain key material | VERIFIED | `inpage.ts`: `Object.freeze(vibeWalletProvider)`, mutable state in closures, no isUnlocked/selectedAddress. TEST-05 passes (4/4 tests). Types file has no key material fields |
 
 **Score:** 5/5 truths verified
 
@@ -38,7 +38,7 @@ re_verification: false
 | `src/features/dapp/types.ts` | DappMessage/DappResponse types, ConnectedSite, EIP-1193 error codes | VERIFIED | Contains `DappRpcRequest`, `DappRpcResponse`, `DappEvent`, `ConnectedSite`, `RPC_ERRORS`. No key material. |
 | `src/features/dapp/rpc-whitelist.ts` | Method classification: direct, approval, blocked | VERIFIED | `RPC_WHITELIST` with 23 entries: 19 direct, 4 approval, 1 blocked (eth_sign). `getMethodCategory` helper exported. |
 | `src/features/dapp/connections.ts` | CRUD for connected sites in chrome.storage.local | VERIFIED | All 5 operations: `getConnectedSites`, `getConnectedSite`, `addConnectedSite`, `removeConnectedSite`, `removeAllConnectedSites`. Atomic read-modify-write. |
-| `src/entrypoints/inpage.ts` | EIP-1193 provider + EIP-6963 announcement | VERIFIED | `MegaWalletProvider` with `request()`, `on()`, `removeListener()`, frozen via `Object.freeze`. EIP-6963 on load + re-announce. `window.ethereum` set. |
+| `src/entrypoints/inpage.ts` | EIP-1193 provider + EIP-6963 announcement | VERIFIED | `VibeWalletProvider` with `request()`, `on()`, `removeListener()`, frozen via `Object.freeze`. EIP-6963 on load + re-announce. `window.ethereum` set. |
 | `src/entrypoints/content.ts` | Bidirectional message relay | VERIFIED | Page→Background relay with `window.location.origin` (not payload). Background→Page relay for events and `dapp:rpcResponse` fallback. |
 | `src/entrypoints/background.ts` | dapp:rpc handler with whitelist routing | VERIFIED | `handleDappRpc` → `handleDirectRpc` / `handleApprovalRpc`. Single listener with dapp:rpc before origin guard. |
 
@@ -68,7 +68,7 @@ re_verification: false
 
 | From | To | Via | Status | Details |
 |------|----|-----|--------|---------|
-| `inpage.ts` | `content.ts` | `window.postMessage` with channel `megawallet-provider` | WIRED | `inpage.ts` posts `{ channel: CHANNEL, direction: 'to-background', id, method, params }`. `content.ts` listens with same channel check. |
+| `inpage.ts` | `content.ts` | `window.postMessage` with channel `vibewallet-provider` | WIRED | `inpage.ts` posts `{ channel: CHANNEL, direction: 'to-background', id, method, params }`. `content.ts` listens with same channel check. |
 | `content.ts` | `background.ts` | `chrome.runtime.sendMessage` with type `dapp:rpc` | WIRED | `content.ts` sends `{ type: 'dapp:rpc', ...msg }`. `background.ts` listener routes on `msg.type === 'dapp:rpc'` before origin guard. |
 | `background.ts` | `rpc-whitelist.ts` | `getMethodCategory` lookup | WIRED | `import { getMethodCategory } from '@/features/dapp/rpc-whitelist'` at line 2. Used in `handleDappRpc`. |
 | `background.ts` | `pending.ts` | `storePendingRequest` / `resolveRequest` | WIRED | `storePendingRequest`, `registerCallback`, `resolveRequest`, `rejectRequest`, `removePendingRequest` all imported and used in approval handlers. |
@@ -95,7 +95,7 @@ re_verification: false
 | DAPP-08 | 05-01 | wallet_switchEthereumChain — accept megaETH only, reject others with 4902 | SATISFIED | `handleDirectRpc` case accepts 4326/6343, returns 4902 error with explanation for all others. |
 | DAPP-09 | 05-01, 05-03 | eth_sign blocked by default; user can enable in Advanced Settings | SATISFIED | `handleDappRpc` returns 4200 for `blocked` methods unless `ethSignEnabled`. Settings screen has red toggle with danger text. |
 | DAPP-10 | 05-01 | Provider validates all requests against whitelist | SATISFIED | `getMethodCategory` returns null for unlisted methods → 4200 error. All methods classified. |
-| DAPP-11 | 05-01, 05-03 | No internal wallet state accessible from provider | SATISFIED | `Object.freeze(megaWalletProvider)`. Mutable state in closures. No `isUnlocked`, `selectedAddress`. TEST-05 confirms. |
+| DAPP-11 | 05-01, 05-03 | No internal wallet state accessible from provider | SATISFIED | `Object.freeze(vibeWalletProvider)`. Mutable state in closures. No `isUnlocked`, `selectedAddress`. TEST-05 confirms. |
 | TEST-05 | 05-03 | Provider isolation test: no key material in dapp boundary | SATISFIED | `tests/provider-isolation.test.ts` passes 4/4 tests. `pnpm test` confirms 124/124 pass. |
 
 **All 12 requirements satisfied.**
@@ -118,8 +118,8 @@ The following items require visual confirmation in Chrome (user marked "approved
 
 #### 1. EIP-6963 Discovery in Real Dapp
 
-**Test:** Load extension, open any dapp with EIP-6963 support (e.g., Uniswap). Check if MegaWallet appears in wallet selection.
-**Expected:** MegaWallet listed alongside MetaMask, Coinbase, etc.
+**Test:** Load extension, open any dapp with EIP-6963 support (e.g., Uniswap). Check if Vibe Wallet appears in wallet selection.
+**Expected:** Vibe Wallet listed alongside MetaMask, Coinbase, etc.
 **Why human:** Requires live browser + dapp with EIP-6963 support.
 
 #### 2. Approval Popup Visual Flow

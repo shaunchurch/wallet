@@ -1,13 +1,13 @@
 # Project Research Summary
 
-**Project:** MegaWallet — Chrome Extension Crypto Wallet
+**Project:** Vibe Wallet — Chrome Extension Crypto Wallet
 **Domain:** Browser extension wallet (megaETH L2)
 **Researched:** 2026-03-01
 **Confidence:** HIGH
 
 ## Executive Summary
 
-MegaWallet is a Chrome Manifest V3 browser extension wallet purpose-built for megaETH L2. Expert wallets (MetaMask, Rabby, Rainbow) all use the same 4-context architecture: inpage provider → content script relay → background service worker → popup UI. The key engineering insight is that the background service worker is the only trusted context — all key operations, signing, and RPC calls happen there. The recommended approach uses TypeScript + viem + Zustand + esbuild with audited zero-dependency crypto (@noble/@scure), giving a wallet that is auditable, small, and correct.
+Vibe Wallet is a Chrome Manifest V3 browser extension wallet purpose-built for megaETH L2. Expert wallets (MetaMask, Rabby, Rainbow) all use the same 4-context architecture: inpage provider → content script relay → background service worker → popup UI. The key engineering insight is that the background service worker is the only trusted context — all key operations, signing, and RPC calls happen there. The recommended approach uses TypeScript + viem + Zustand + esbuild with audited zero-dependency crypto (@noble/@scure), giving a wallet that is auditable, small, and correct.
 
 megaETH's unique capabilities are the entire product justification. Standard wallets are literally broken on megaETH — they hardcode 21k gas (megaETH requires 60k minimum) and poll for balance updates on a chain with 10ms blocks. This creates a clear wedge: the first wallet that handles megaETH's multidimensional gas correctly, uses the `stateChanges` WebSocket subscription for real-time balances, and leverages `realtime_sendRawTransaction` for instant confirmation will feel categorically different from MetaMask.
 

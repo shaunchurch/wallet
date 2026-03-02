@@ -63,7 +63,7 @@ completed: 2026-03-01
 - **Files modified:** 13
 
 ## Accomplishments
-- Styled 360x600 popup: header with megawallet branding, balance placeholder, send/receive buttons
+- Styled 360x600 popup: header with vibewallet branding, balance placeholder, send/receive buttons
 - Working light/dark theme toggle with localStorage persistence
 - Deterministic build test proving byte-identical output
 - Version pin test enforcing zero ^ or ~ in package.json
@@ -78,7 +78,7 @@ Each task was committed atomically:
 
 ## Files Created/Modified
 - `src/features/ui/ThemeProvider.tsx` - Theme context with toggle, localStorage, system preference
-- `src/features/ui/components/Header.tsx` - Header bar with megawallet branding and theme toggle button
+- `src/features/ui/components/Header.tsx` - Header bar with vibewallet branding and theme toggle button
 - `src/features/ui/components/BalancePlaceholder.tsx` - Placeholder balance display (0.00 ETH / $0.00)
 - `src/features/ui/components/ActionButtons.tsx` - Disabled Send/Receive buttons with violet accent
 - `src/features/ui/App.tsx` - Main popup layout composing all components

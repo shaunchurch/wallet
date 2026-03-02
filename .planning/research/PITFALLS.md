@@ -123,22 +123,22 @@ Phase 3 (advanced features). EIP-7702 is explicitly post-MVP but architecture mu
 ### Pitfall 5: Provider Injection Race Conditions and Wallet Conflicts
 
 **What goes wrong:**
-Multiple wallet extensions fight over `window.ethereum`. Without EIP-6963, extensions inject in unpredictable order. Dapps detect wrong wallet, user transactions go to wrong provider, or provider is overwritten mid-session. Users with MetaMask + MegaWallet installed get inconsistent behavior.
+Multiple wallet extensions fight over `window.ethereum`. Without EIP-6963, extensions inject in unpredictable order. Dapps detect wrong wallet, user transactions go to wrong provider, or provider is overwritten mid-session. Users with MetaMask + Vibe Wallet installed get inconsistent behavior.
 
 **Why it happens:**
-Content scripts inject at `document_start` or `document_idle` with no guaranteed ordering. Legacy dapps check `window.ethereum` directly. Even with EIP-6963 (event-based multi-provider discovery), many dapps still fall back to `window.ethereum`. If MegaWallet overwrites it, MetaMask users complain. If it doesn't, dapps don't find it.
+Content scripts inject at `document_start` or `document_idle` with no guaranteed ordering. Legacy dapps check `window.ethereum` directly. Even with EIP-6963 (event-based multi-provider discovery), many dapps still fall back to `window.ethereum`. If Vibe Wallet overwrites it, MetaMask users complain. If it doesn't, dapps don't find it.
 
 **How to avoid:**
 - Implement EIP-6963 (Multi Injected Provider Discovery) as primary mechanism
 - Also inject `window.ethereum` for legacy dapp compatibility but with proper `isMetaMask` guard
 - Use `eip6963:announceProvider` event to register without conflicts
-- Set a unique `uuid` and clear `rdns` identifier (e.g., `com.emptystring.megawallet`)
+- Set a unique `uuid` and clear `rdns` identifier (e.g., `com.vibewallet`)
 - Do NOT set `isMetaMask = true` (some wallets do this for compatibility, it causes confusion)
 - Handle the case where dapp only checks `window.ethereum` -- be discoverable but don't fight
 - Test with MetaMask, Rabby, Coinbase Wallet, and Phantom all installed simultaneously
 
 **Warning signs:**
-- Dapp says "install MetaMask" when MegaWallet is installed
+- Dapp says "install MetaMask" when Vibe Wallet is installed
 - Transactions route to wrong wallet
 - `window.ethereum.isMetaMask` returns true from your extension
 - User reports "works alone, breaks with other wallets installed"
@@ -159,7 +159,7 @@ Chrome Web Store policies are strict and getting stricter. Crypto wallets are hi
 **How to avoid:**
 - Request absolute minimum permissions. Use `activeTab` scoped to interaction, not `<all_urls>`
 - Never use remote code -- all code must be in the extension bundle
-- Clear, specific store description: "MegaWallet sends and receives ETH on megaETH L2"
+- Clear, specific store description: "Vibe Wallet sends and receives ETH on megaETH L2"
 - Privacy policy URL in manifest and developer dashboard
 - No code obfuscation/minification that hides intent (readable source is fine)
 - Declare all data collection in privacy practices tab

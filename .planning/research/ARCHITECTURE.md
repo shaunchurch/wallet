@@ -230,7 +230,7 @@ class WebSocketManager {
 
 ```typescript
 // content/inpage.ts (injected into MAIN world)
-const provider = new MegaWalletProvider(); // implements EIP-1193
+const provider = new VibeWalletProvider(); // implements EIP-1193
 
 // Legacy injection
 window.ethereum = provider;
@@ -240,9 +240,9 @@ window.dispatchEvent(new CustomEvent('eip6963:announceProvider', {
   detail: Object.freeze({
     info: {
       uuid: crypto.randomUUID(),
-      name: 'MegaWallet',
+      name: 'Vibe Wallet',
       icon: 'data:image/svg+xml;base64,...',
-      rdns: 'dev.emptystring.megawallet'
+      rdns: 'dev.emptystring.vibewallet'
     },
     provider
   })
@@ -443,7 +443,7 @@ EIP-7702 adds tx type `0x04` allowing EOAs to temporarily delegate to smart cont
 ### Anti-Pattern 4: Using window.ethereum Without EIP-6963
 
 **What people do:** Only set `window.ethereum`, overwriting other wallets
-**Why it's wrong:** Causes wallet collision. Users with MetaMask + MegaWallet get unpredictable behavior.
+**Why it's wrong:** Causes wallet collision. Users with MetaMask + Vibe Wallet get unpredictable behavior.
 **Do this instead:** Implement EIP-6963 `announceProvider` event. Keep `window.ethereum` as fallback for legacy dapps.
 
 ### Anti-Pattern 5: Local Gas Estimation on megaETH

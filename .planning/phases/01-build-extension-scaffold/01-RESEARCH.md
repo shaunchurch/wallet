@@ -29,7 +29,7 @@ esbuild is inherently deterministic for same inputs -- no timestamps or randomne
 - 360x600 popup dimensions (industry standard)
 - Styled skeleton previewing eventual layout (header bar, balance area, action buttons -- all placeholder)
 - Placeholder text logo/SVG icon (no brand assets yet)
-- Extension name: "megawallet" (lowercase)
+- Extension name: "vibewallet" (lowercase)
 - Manifest description: "The fastest wallet for the fastest chain"
 - Feature-based layout: src/features/ + src/entrypoints/
 - Entrypoints: background.ts, content.ts, popup.tsx, inpage.ts
@@ -110,7 +110,7 @@ shadcn/ui components are added individually via `npx shadcn@3.8.5 add <component
 
 ### Recommended Project Structure
 ```
-megawallet/
+vibewallet/
 ├── .npmrc                    # save-exact=true
 ├── biome.json                # Biome config
 ├── components.json           # shadcn/ui config
@@ -205,7 +205,7 @@ await esbuild.build({
 ```json
 {
   "manifest_version": 3,
-  "name": "megawallet",
+  "name": "vibewallet",
   "version": "0.1.0",
   "description": "The fastest wallet for the fastest chain",
   "permissions": ["storage", "activeTab"],
@@ -215,7 +215,7 @@ await esbuild.build({
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "megawallet"
+    "default_title": "vibewallet"
   },
   "content_scripts": [
     {
@@ -390,11 +390,11 @@ if (root) {
 ### background.ts (Minimal Scaffold)
 ```typescript
 // MV3 service worker -- placeholder for Phase 1
-console.log('[megawallet] background service worker started');
+console.log('[vibewallet] background service worker started');
 
 // Keep alive for debugging (Phase 1 only)
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('[megawallet] extension installed');
+  console.log('[vibewallet] extension installed');
 });
 ```
 

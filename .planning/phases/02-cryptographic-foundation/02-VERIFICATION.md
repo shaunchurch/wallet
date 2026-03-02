@@ -112,7 +112,7 @@ No orphaned requirements: REQUIREMENTS.md traceability table maps all 11 IDs to 
 
 ### Anti-Patterns Found
 
-None. Scanned all 14 source files from the phase. No TODOs, FIXMEs, placeholder returns, empty handlers, or `console.log` with key material found. The only `console.log` calls in `background.ts` log static strings (`[megawallet] background service worker started`, `[megawallet] extension installed`).
+None. Scanned all 14 source files from the phase. No TODOs, FIXMEs, placeholder returns, empty handlers, or `console.log` with key material found. The only `console.log` calls in `background.ts` log static strings (`[vibewallet] background service worker started`, `[vibewallet] extension installed`).
 
 ### Human Verification Required
 

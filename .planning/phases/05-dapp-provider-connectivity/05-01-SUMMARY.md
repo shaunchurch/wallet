@@ -39,7 +39,7 @@ key-decisions:
   - "Provider frozen via Object.freeze -- _emit/_handleResponse still callable but no state mutation"
 
 patterns-established:
-  - "megawallet-provider channel + direction field for inpage<->content messaging"
+  - "vibewallet-provider channel + direction field for inpage<->content messaging"
   - "Content script attaches origin via window.location.origin, never trusts page payload"
   - "Background dapp handler parallel to wallet handler with separate sender checks"
 
@@ -81,14 +81,14 @@ completed: 2026-03-02
 - `src/features/dapp/types.ts` - DappRpcRequest, DappRpcResponse, DappEvent, ConnectedSite, RPC_ERRORS
 - `src/features/dapp/rpc-whitelist.ts` - RPC_WHITELIST record + getMethodCategory helper
 - `src/features/dapp/connections.ts` - Connected sites CRUD (get/add/remove/removeAll)
-- `src/entrypoints/inpage.ts` - MegaWalletProvider class + EIP-6963 announcement
+- `src/entrypoints/inpage.ts` - VibeWalletProvider class + EIP-6963 announcement
 - `src/entrypoints/content.ts` - Bidirectional message relay + getFavicon helper
 - `src/entrypoints/background.ts` - handleDappRpc + handleDirectRpc + dapp listener
 
 ## Decisions Made
 - Used `export {}` in inpage.ts and content.ts to enforce TS module isolation (both build as IIFE but TS needs module boundaries to avoid `CHANNEL` variable conflicts)
 - Separate `chrome.runtime.onMessage.addListener` for dapp:rpc -- keeps wallet and dapp message paths independent
-- Provider frozen via `Object.freeze(new MegaWalletProvider())` -- internal methods `_emit` and `_handleResponse` remain callable through the message listener closure, but no external state mutation possible
+- Provider frozen via `Object.freeze(new VibeWalletProvider())` -- internal methods `_emit` and `_handleResponse` remain callable through the message listener closure, but no external state mutation possible
 
 ## Deviations from Plan
 

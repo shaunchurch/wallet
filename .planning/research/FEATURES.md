@@ -149,7 +149,7 @@ Once core is stable and users are onboarded.
 
 ## Competitor Feature Analysis
 
-| Feature | MetaMask | Rabby | Rainbow | Frame | MegaWallet (Ours) |
+| Feature | MetaMask | Rabby | Rainbow | Frame | Vibe Wallet (Ours) |
 |---------|----------|-------|---------|-------|-------------------|
 | Multi-chain | 15+ chains | 100+ EVM | 6 L2s + ETH | Omnichain | megaETH only (by design) |
 | Tx simulation | Basic (via Blockaid) | Full balance-change preview | None | Decoded calldata | Balance-change + megaETH-speed sim |
@@ -183,5 +183,5 @@ MetaMask and Rabby **fail on megaETH** because they hardcode 21k gas for ETH tra
 - [Nadcab secure wallet guide](https://www.nadcab.com/blog/secure-crypto-wallet-browser-extension-architecture-guide) — MEDIUM confidence: security architecture patterns
 
 ---
-*Feature research for: MegaWallet — megaETH browser extension wallet*
+*Feature research for: Vibe Wallet — megaETH browser extension wallet*
 *Researched: 2026-03-01*

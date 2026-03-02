@@ -31,7 +31,7 @@ MV3 Chrome extension that loads with correct manifest, strict CSP, esbuild multi
 ### Placeholder Popup
 - Styled skeleton previewing eventual layout (header bar, balance area, action buttons — all placeholder)
 - Placeholder text logo/SVG icon (no brand assets yet)
-- Extension name: "megawallet" (lowercase)
+- Extension name: "vibewallet" (lowercase)
 - Manifest description: "The fastest wallet for the fastest chain"
 
 ### Source Organization
@@ -56,7 +56,7 @@ MV3 Chrome extension that loads with correct manifest, strict CSP, esbuild multi
 <specifics>
 ## Specific Ideas
 
-- Extension name is lowercase "megawallet" — dev/hacker aesthetic
+- Extension name is lowercase "vibewallet" — dev/hacker aesthetic
 - Tagline "The fastest wallet for the fastest chain" — speed is the brand
 - Styled skeleton popup should preview the vision even before wallet logic exists
 - Both light and dark themes from day 1 (unusual for crypto wallets but user preference)
@@ -73,7 +73,7 @@ MV3 Chrome extension that loads with correct manifest, strict CSP, esbuild multi
 - None — all patterns will be established in this phase
 
 ### Integration Points
-- PRD exists at megawallet-prd.md with detailed megaETH-specific requirements
+- PRD exists at vibewallet-prd.md with detailed megaETH-specific requirements
 - .planning/ directory initialized with ROADMAP.md and REQUIREMENTS.md
 
 </code_context>

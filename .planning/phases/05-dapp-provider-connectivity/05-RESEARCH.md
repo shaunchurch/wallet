@@ -123,7 +123,7 @@ src/
 
 ```typescript
 // Inpage: post to content script via window.postMessage
-const CHANNEL = 'megawallet-provider';
+const CHANNEL = 'vibewallet-provider';
 window.postMessage({ channel: CHANNEL, id: requestId, method, params }, '*');
 
 // Content script: relay to background via chrome.runtime
@@ -181,9 +181,9 @@ async function openApprovalPopup(requestId: string, type: string): Promise<void>
 // Source: EIP-6963 specification
 const info: EIP6963ProviderInfo = {
   uuid: crypto.randomUUID(),
-  name: 'megawallet',
+  name: 'vibewallet',
   icon: 'data:image/svg+xml,...', // Base64 or SVG data URI
-  rdns: 'com.megawallet',
+  rdns: 'com.vibewallet',
 };
 
 const detail = Object.freeze({ info, provider });
@@ -300,7 +300,7 @@ const RPC_ERRORS = {
   CHAIN_DISCONNECTED: { code: 4901, message: 'Chain disconnected' },
 } as const;
 
-class MegaWalletProvider {
+class VibeWalletProvider {
   private _listeners: Map<string, Set<Function>> = new Map();
   private _requestId = 0;
   private _pendingRequests = new Map<number, { resolve: Function; reject: Function }>();
@@ -310,7 +310,7 @@ class MegaWalletProvider {
     return new Promise((resolve, reject) => {
       this._pendingRequests.set(id, { resolve, reject });
       window.postMessage({
-        channel: 'megawallet-provider',
+        channel: 'vibewallet-provider',
         id,
         method: args.method,
         params: args.params,
@@ -348,7 +348,7 @@ class MegaWalletProvider {
 ### Content Script Relay
 ```typescript
 // Source: Chrome extension messaging patterns
-const CHANNEL = 'megawallet-provider';
+const CHANNEL = 'vibewallet-provider';
 
 // Page -> Background relay
 window.addEventListener('message', (event) => {
