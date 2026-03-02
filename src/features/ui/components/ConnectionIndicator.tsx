@@ -26,11 +26,9 @@ export function ConnectionIndicator() {
   if (!siteName) return null;
 
   return (
-    <div className="flex items-center gap-1">
-      <span className="size-2 rounded-full bg-green-500" />
-      <span className="max-w-[100px] truncate text-xs text-zinc-500 dark:text-zinc-400">
-        {siteName}
-      </span>
-    </div>
+    <span
+      className="size-2 rounded-full bg-green-500"
+      title={`Connected to ${siteName}`}
+    />
   );
 }
