@@ -1,4 +1,7 @@
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js';
+import { getConnectedSite } from '@/features/dapp/connections';
+import { getMethodCategory } from '@/features/dapp/rpc-whitelist';
+import type { DappRpcRequest, DappRpcResponse } from '@/features/dapp/types';
 import {
   createLockoutManager,
   decryptVault,
@@ -641,6 +644,102 @@ async function handleSendTransaction(
 }
 
 // ---------------------------------------------------------------------------
+// Dapp RPC handler (DAPP-07 through DAPP-10)
+// ---------------------------------------------------------------------------
+
+async function handleDappRpc(msg: DappRpcRequest): Promise<DappRpcResponse> {
+  const category = getMethodCategory(msg.method);
+
+  // Unknown method
+  if (!category) {
+    return { error: { code: 4200, message: `Unsupported method: ${msg.method}` } };
+  }
+
+  // Blocked methods (DAPP-09: eth_sign blocked unless user enabled)
+  if (category === 'blocked') {
+    const { ethSignEnabled } = await chrome.storage.local.get('ethSignEnabled');
+    if (!ethSignEnabled) {
+      return {
+        error: {
+          code: 4200,
+          message:
+            'eth_sign is disabled for security. Use personal_sign instead. Enable in Advanced Settings if required.',
+        },
+      };
+    }
+    // eth_sign enabled -- treat as approval (falls through)
+  }
+
+  // Direct methods -- handle locally or proxy to RPC
+  if (category === 'direct') {
+    return handleDirectRpc(msg);
+  }
+
+  // Approval methods -- will be implemented in plan 05-02
+  return {
+    error: { code: 4200, message: `Method ${msg.method} requires approval (not yet implemented)` },
+  };
+}
+
+async function handleDirectRpc(msg: DappRpcRequest): Promise<DappRpcResponse> {
+  const network = await getNetworkPreference();
+
+  switch (msg.method) {
+    case 'eth_chainId': {
+      const { chainId } = NETWORKS[network];
+      return { result: `0x${chainId.toString(16)}` };
+    }
+    case 'eth_accounts': {
+      // Return connected accounts for this origin, or empty array if not connected
+      const site = await getConnectedSite(msg.origin);
+      return { result: site?.accounts ?? [] };
+    }
+    case 'net_version': {
+      const { chainId } = NETWORKS[network];
+      return { result: String(chainId) };
+    }
+    case 'web3_clientVersion': {
+      return { result: 'megawallet/0.1.0' };
+    }
+    case 'wallet_switchEthereumChain': {
+      // DAPP-08: accept megaETH chains only
+      const params = msg.params as [{ chainId: string }] | undefined;
+      const requestedChainId = params?.[0]?.chainId;
+      if (!requestedChainId) {
+        return { error: { code: -32602, message: 'Missing chainId parameter' } };
+      }
+      const requested = Number(requestedChainId);
+      const mainnetId = NETWORKS.mainnet.chainId;
+      const testnetId = NETWORKS.testnet.chainId;
+      if (requested === mainnetId) {
+        await chrome.storage.local.set({ network: 'mainnet' });
+        return { result: null };
+      }
+      if (requested === testnetId) {
+        await chrome.storage.local.set({ network: 'testnet' });
+        return { result: null };
+      }
+      return {
+        error: {
+          code: 4902,
+          message: `megawallet only supports megaETH mainnet (${mainnetId}) and testnet (${testnetId}). Add the chain to a multi-chain wallet like MetaMask.`,
+        },
+      };
+    }
+    default: {
+      // Proxy all other direct methods to megaETH RPC
+      try {
+        const result = await rpcCall(network, msg.method, msg.params ?? []);
+        return { result };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'RPC call failed';
+        return { error: { code: -32603, message } };
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Listener registration
 // ---------------------------------------------------------------------------
 
@@ -654,6 +753,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     handleWalletMessage(msg as WalletMessage).then(sendResponse);
     return true; // async response
   }
+});
+
+// ---------------------------------------------------------------------------
+// Dapp RPC listener (separate from wallet listener)
+// ---------------------------------------------------------------------------
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  // Dapp messages come from content scripts -- same extension ID, but web origin
+  if (sender.id !== chrome.runtime.id) return;
+  if (msg.type !== 'dapp:rpc') return;
+
+  handleDappRpc(msg as DappRpcRequest).then(sendResponse);
+  return true; // async response
 });
 
 // ---------------------------------------------------------------------------
