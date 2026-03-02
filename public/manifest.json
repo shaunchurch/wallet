@@ -3,7 +3,7 @@
   "name": "megawallet",
   "version": "0.1.0",
   "description": "The fastest wallet for the fastest chain",
-  "permissions": ["storage", "alarms"],
+  "permissions": ["storage", "alarms", "tabs"],
   "host_permissions": [
     "https://mainnet.megaeth.com/*",
     "https://carrot.megaeth.com/*",

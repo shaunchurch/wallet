@@ -18,7 +18,11 @@ export type Screen =
   | 'send-recipient'
   | 'send-amount'
   | 'send-confirm'
-  | 'send-result';
+  | 'send-result'
+  | 'dapp-connect'
+  | 'dapp-sign'
+  | 'dapp-confirm'
+  | 'connections';
 
 interface WalletStore {
   // Navigation
@@ -59,6 +63,30 @@ interface WalletStore {
     } | null,
   ) => void;
   clearSendState: () => void;
+
+  // Dapp approval state
+  pendingDappRequest: {
+    id: string;
+    method: string;
+    params?: unknown[];
+    origin: string;
+    favicon?: string;
+    title?: string;
+  } | null;
+  setPendingDappRequest: (
+    req: {
+      id: string;
+      method: string;
+      params?: unknown[];
+      origin: string;
+      favicon?: string;
+      title?: string;
+    } | null,
+  ) => void;
+
+  // Advanced Settings: eth_sign toggle (DAPP-09)
+  ethSignEnabled: boolean;
+  setEthSignEnabled: (enabled: boolean) => void;
 
   // Actions
   initialize: () => Promise<void>;
@@ -122,10 +150,25 @@ export const useWalletStore = create<WalletStore>()((set, get) => ({
   setSendResult: (result) => set({ sendResult: result }),
   clearSendState: () => set({ sendTo: '', sendAmountWei: '', sendAmountEth: '', sendResult: null }),
 
+  // Dapp approval state
+  pendingDappRequest: null,
+  setPendingDappRequest: (req) => set({ pendingDappRequest: req }),
+
+  // Advanced Settings: eth_sign toggle (DAPP-09)
+  ethSignEnabled: false,
+  setEthSignEnabled: (enabled) => {
+    chrome.storage.local.set({ ethSignEnabled: enabled });
+    set({ ethSignEnabled: enabled });
+  },
+
   // Actions
   initialize: async () => {
     // Start on loading
     set({ currentScreen: 'loading', screenStack: ['loading'] });
+
+    // Load persisted eth_sign toggle
+    const { ethSignEnabled } = await chrome.storage.local.get('ethSignEnabled');
+    set({ ethSignEnabled: !!ethSignEnabled });
 
     // Check if vault exists
     const result = await chrome.storage.local.get('vault');
@@ -138,7 +181,11 @@ export const useWalletStore = create<WalletStore>()((set, get) => ({
     const resp = await sendWalletMessage({ type: 'wallet:getAccounts' });
     if (resp.type === 'wallet:accounts') {
       // Load persisted preferences
-      const stored = await chrome.storage.local.get(['network', 'autoLockMinutes', 'activeAccountIndex']);
+      const stored = await chrome.storage.local.get([
+        'network',
+        'autoLockMinutes',
+        'activeAccountIndex',
+      ]);
       const network = stored.network === 'testnet' ? 'testnet' : 'mainnet';
       const autoLockMinutes =
         typeof stored.autoLockMinutes === 'number' ? stored.autoLockMinutes : 15;
@@ -153,11 +200,33 @@ export const useWalletStore = create<WalletStore>()((set, get) => ({
         activeAccountIndex,
         network,
         autoLockMinutes,
-        currentScreen: 'main',
-        screenStack: ['main'],
       });
       // Load account names after setting accounts
       get().loadAccountNames();
+
+      // Check for pending dapp request (opened via chrome.windows.create from background)
+      const dappResp = await sendWalletMessage({ type: 'dapp:getPendingRequest' });
+      if (dappResp.type === 'dapp:pendingRequest' && dappResp.request) {
+        const req = dappResp.request as {
+          id: string;
+          method: string;
+          params?: unknown[];
+          origin: string;
+          favicon?: string;
+          title?: string;
+        };
+        set({ pendingDappRequest: req });
+        if (req.method === 'eth_requestAccounts') {
+          set({ currentScreen: 'dapp-connect', screenStack: ['dapp-connect'] });
+        } else if (req.method === 'eth_sendTransaction') {
+          set({ currentScreen: 'dapp-confirm', screenStack: ['dapp-confirm'] });
+        } else if (req.method === 'personal_sign' || req.method === 'eth_signTypedData_v4') {
+          set({ currentScreen: 'dapp-sign', screenStack: ['dapp-sign'] });
+        }
+        return; // Don't show normal wallet UI for dapp popups
+      }
+
+      set({ currentScreen: 'main', screenStack: ['main'] });
     } else {
       set({ isLocked: true, currentScreen: 'lock', screenStack: ['lock'] });
     }

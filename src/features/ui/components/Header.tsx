@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useWalletStore } from '@/features/wallet/store';
 import { Jazzicon } from '@/lib/jazzicon';
 import { useTheme } from '../ThemeProvider';
+import { ConnectionIndicator } from './ConnectionIndicator';
 
 function truncateAddress(addr: string): string {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -16,7 +17,10 @@ const SUB_SCREENS = new Set([
   'send-amount',
   'send-confirm',
   'send-result',
+  'connections',
 ]);
+
+const DAPP_SCREENS = new Set(['dapp-connect', 'dapp-sign', 'dapp-confirm']);
 
 function ThemeToggle() {
   const { theme, toggle } = useTheme();
@@ -90,6 +94,10 @@ const SCREEN_TITLES: Record<string, string> = {
   'send-amount': 'Amount',
   'send-confirm': 'Confirm',
   'send-result': 'Result',
+  'dapp-connect': 'Connect',
+  'dapp-sign': 'Sign',
+  'dapp-confirm': 'Confirm',
+  connections: 'Connections',
 };
 
 export function Header() {
@@ -97,6 +105,7 @@ export function Header() {
   const accounts = useWalletStore((s) => s.accounts);
   const activeAccountIndex = useWalletStore((s) => s.activeAccountIndex);
   const toggleSidebar = useWalletStore((s) => s.toggleSidebar);
+  const push = useWalletStore((s) => s.push);
   const pop = useWalletStore((s) => s.pop);
 
   const activeAccount = accounts[activeAccountIndex];
@@ -108,6 +117,16 @@ export function Header() {
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }, [activeAccount]);
+
+  // --- Dapp approval screens: minimal header with title (no back button) ---
+  if (DAPP_SCREENS.has(currentScreen)) {
+    return (
+      <header className="flex items-center justify-between border-b border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950">
+        <span className="text-sm font-semibold">{SCREEN_TITLES[currentScreen] ?? ''}</span>
+        <ThemeToggle />
+      </header>
+    );
+  }
 
   // --- Sub-screen mode: back arrow + title ---
   if (SUB_SCREENS.has(currentScreen)) {
@@ -155,9 +174,34 @@ export function Header() {
           >
             {copied ? 'Copied!' : truncateAddress(activeAccount.address)}
           </button>
+          <ConnectionIndicator />
           <NetworkPill />
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => push('connections')}
+            aria-label="Connected sites"
+          >
+            <svg
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="size-4"
+            >
+              <circle cx={12} cy={12} r={10} />
+              <line x1={2} y1={12} x2={22} y2={12} />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+          </Button>
+          <ThemeToggle />
+        </div>
       </header>
     );
   }

@@ -53,6 +53,8 @@ export function SettingsScreen() {
   const push = useWalletStore((s) => s.push);
   const network = useWalletStore((s) => s.network);
   const setNetwork = useWalletStore((s) => s.setNetwork);
+  const ethSignEnabled = useWalletStore((s) => s.ethSignEnabled);
+  const setEthSignEnabled = useWalletStore((s) => s.setEthSignEnabled);
 
   const [autoLockMinutes, setAutoLockMinutes] = useState(15);
   const [seedModalOpen, setSeedModalOpen] = useState(false);
@@ -78,87 +80,127 @@ export function SettingsScreen() {
 
   return (
     <>
-    <Header />
-    <div className="flex flex-1 flex-col overflow-y-auto px-4 pt-4 pb-6">
-      {/* Security section */}
-      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-        Security
-      </h2>
-      <div className="mb-5 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
-        {/* Auto-Lock Timer */}
-        <div className="flex items-center justify-between px-4 py-3">
-          <span className="text-sm">Auto-Lock Timer</span>
-          <select
-            value={autoLockMinutes}
-            onChange={handleAutoLockChange}
-            className="rounded-md border border-zinc-200 bg-transparent px-2 py-1 text-sm dark:border-zinc-700"
+      <Header />
+      <div className="flex flex-1 flex-col overflow-y-auto px-4 pt-4 pb-6">
+        {/* Security section */}
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          Security
+        </h2>
+        <div className="mb-5 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+          {/* Auto-Lock Timer */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <span className="text-sm">Auto-Lock Timer</span>
+            <select
+              value={autoLockMinutes}
+              onChange={handleAutoLockChange}
+              className="rounded-md border border-zinc-200 bg-transparent px-2 py-1 text-sm dark:border-zinc-700"
+            >
+              {AUTO_LOCK_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Divider */}
+          <div className="mx-4 border-t border-zinc-100 dark:border-zinc-800" />
+
+          {/* Export Seed Phrase */}
+          <button
+            type="button"
+            onClick={() => setSeedModalOpen(true)}
+            className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
           >
-            {AUTO_LOCK_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            <span className="flex items-center gap-2 text-sm">
+              <WarningIcon />
+              Export Seed Phrase
+            </span>
+            <ChevronRight />
+          </button>
+
+          {/* Divider */}
+          <div className="mx-4 border-t border-zinc-100 dark:border-zinc-800" />
+
+          {/* Connected Sites */}
+          <button
+            type="button"
+            onClick={() => push('connections')}
+            className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
+          >
+            <span className="text-sm">Connected Sites</span>
+            <ChevronRight />
+          </button>
         </div>
 
-        {/* Divider */}
-        <div className="mx-4 border-t border-zinc-100 dark:border-zinc-800" />
-
-        {/* Export Seed Phrase */}
-        <button
-          type="button"
-          onClick={() => setSeedModalOpen(true)}
-          className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
-        >
-          <span className="flex items-center gap-2 text-sm">
-            <WarningIcon />
-            Export Seed Phrase
-          </span>
-          <ChevronRight />
-        </button>
-      </div>
-
-      {/* Network section */}
-      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-        Network
-      </h2>
-      <div className="mb-5 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
-        <button
-          type="button"
-          onClick={handleNetworkToggle}
-          className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
-        >
-          <span className="text-sm">Network</span>
-          <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              network === 'testnet'
-                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
-                : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
-            }`}
+        {/* Network section */}
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          Network
+        </h2>
+        <div className="mb-5 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <button
+            type="button"
+            onClick={handleNetworkToggle}
+            className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
           >
-            {network === 'mainnet' ? 'Mainnet' : 'Testnet'}
-          </span>
-        </button>
-      </div>
+            <span className="text-sm">Network</span>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                network === 'testnet'
+                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
+                  : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
+              }`}
+            >
+              {network === 'mainnet' ? 'Mainnet' : 'Testnet'}
+            </span>
+          </button>
+        </div>
 
-      {/* About section */}
-      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-        About
-      </h2>
-      <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
-        <button
-          type="button"
-          onClick={() => push('about')}
-          className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
-        >
-          <span className="text-sm">About megawallet</span>
-          <ChevronRight />
-        </button>
-      </div>
+        {/* Advanced section (DAPP-09) */}
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          Advanced
+        </h2>
+        <div className="mb-5 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="mr-3">
+              <span className="text-sm">Enable eth_sign</span>
+              <p className="mt-0.5 text-xs text-zinc-400">
+                Dangerous -- allows signing arbitrary hashes. Only enable if a dapp specifically
+                requires it.
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={ethSignEnabled}
+              onClick={() => setEthSignEnabled(!ethSignEnabled)}
+              className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors ${ethSignEnabled ? 'bg-red-500' : 'bg-zinc-300 dark:bg-zinc-600'}`}
+            >
+              <span
+                className={`pointer-events-none mt-0.5 inline-block size-4 transform rounded-full bg-white shadow transition-transform ${ethSignEnabled ? 'translate-x-4' : 'translate-x-0.5'}`}
+              />
+            </button>
+          </div>
+        </div>
 
-      {/* Seed Export Modal */}
-      <SeedExportModal isOpen={seedModalOpen} onClose={() => setSeedModalOpen(false)} />
-    </div>
+        {/* About section */}
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          About
+        </h2>
+        <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <button
+            type="button"
+            onClick={() => push('about')}
+            className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
+          >
+            <span className="text-sm">About megawallet</span>
+            <ChevronRight />
+          </button>
+        </div>
+
+        {/* Seed Export Modal */}
+        <SeedExportModal isOpen={seedModalOpen} onClose={() => setSeedModalOpen(false)} />
+      </div>
     </>
   );
 }

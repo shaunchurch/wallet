@@ -4,7 +4,11 @@ import { type Screen, useWalletStore } from '../wallet/store';
 import { OnboardingProvider } from './OnboardingContext';
 import { AboutScreen } from './screens/AboutScreen';
 import { ConfirmSeedScreen } from './screens/ConfirmSeedScreen';
+import { ConnectionsScreen } from './screens/ConnectionsScreen';
 import { CreatePasswordScreen } from './screens/CreatePasswordScreen';
+import { DappConfirmScreen } from './screens/DappConfirmScreen';
+import { DappConnectScreen } from './screens/DappConnectScreen';
+import { DappSignScreen } from './screens/DappSignScreen';
 import { ImportPasswordScreen } from './screens/ImportPasswordScreen';
 import { ImportSeedScreen } from './screens/ImportSeedScreen';
 import { LockScreen } from './screens/LockScreen';
@@ -36,6 +40,10 @@ const screens: Record<Screen, React.ComponentType> = {
   'send-amount': SendAmountScreen,
   'send-confirm': SendConfirmScreen,
   'send-result': SendResultScreen,
+  'dapp-connect': DappConnectScreen,
+  'dapp-sign': DappSignScreen,
+  'dapp-confirm': DappConfirmScreen,
+  connections: ConnectionsScreen,
 };
 
 function LoadingScreen() {
