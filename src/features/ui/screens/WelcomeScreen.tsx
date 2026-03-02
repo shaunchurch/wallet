@@ -9,9 +9,9 @@ export function WelcomeScreen() {
       {/* Logo / Branding */}
       <div className="flex flex-col items-center gap-3">
         <div className="flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-2xl font-bold text-white shadow-lg">
-          M
+          V
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">megawallet</h1>
+        <h1 className="text-2xl font-bold tracking-tight">vibewallet</h1>
         <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
           The fastest wallet for the fastest chain
         </p>

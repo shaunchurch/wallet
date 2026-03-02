@@ -12,7 +12,7 @@ script.onload = () => script.remove();
 // Message relay
 // ---------------------------------------------------------------------------
 
-const CHANNEL = 'megawallet-provider';
+const CHANNEL = 'vibewallet-provider';
 
 function getFavicon(): string {
   const link = document.querySelector<HTMLLinkElement>('link[rel~="icon"]');

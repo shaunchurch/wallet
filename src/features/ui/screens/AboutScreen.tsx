@@ -1,8 +1,8 @@
 import { Header } from '../components/Header';
 
-const GITHUB_URL = 'https://github.com/nicholasgriffintn/megawallet';
-const ISSUES_URL = 'https://github.com/nicholasgriffintn/megawallet/issues';
-const SECURITY_EMAIL = 'security@megawallet.dev';
+const GITHUB_URL = 'https://github.com/nicholasgriffintn/vibewallet';
+const ISSUES_URL = 'https://github.com/nicholasgriffintn/vibewallet/issues';
+const SECURITY_EMAIL = 'security@vibewallet.dev';
 
 function LinkRow({ label, href }: { label: string; href: string }) {
   return (
@@ -41,11 +41,11 @@ export function AboutScreen() {
     <div className="flex flex-1 flex-col items-center px-6 pt-12 pb-6">
       {/* Logo */}
       <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-2xl font-bold text-white shadow-lg">
-        M
+        V
       </div>
 
       {/* Name + version */}
-      <h1 className="text-lg font-bold">megawallet</h1>
+      <h1 className="text-lg font-bold">vibewallet</h1>
       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Version {version}</p>
       <p className="mt-3 text-center text-xs text-zinc-400 dark:text-zinc-500">
         The fastest wallet for the fastest chain

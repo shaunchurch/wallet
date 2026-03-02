@@ -1,8 +1,8 @@
-# Roadmap: MegaWallet
+# Roadmap: Vibe Wallet
 
 ## Overview
 
-MegaWallet ships in 9 phases following the dependency graph: build scaffold, then crypto foundation (TDD), then wallet UI shell, then ETH transactions with megaETH-native gas, then dapp connectivity (EIP-1193/6963), then real-time streaming (the killer differentiator), then transaction intelligence (simulation, finality, warnings), then ERC-20 token ecosystem, and finally transaction history with bridge onboarding. Each phase delivers a coherent, testable capability. Phases 1-4 produce a standalone wallet. Phases 5-9 add the features that make it categorically better than MetaMask on megaETH.
+Vibe Wallet ships in 9 phases following the dependency graph: build scaffold, then crypto foundation (TDD), then wallet UI shell, then ETH transactions with megaETH-native gas, then dapp connectivity (EIP-1193/6963), then real-time streaming (the killer differentiator), then transaction intelligence (simulation, finality, warnings), then ERC-20 token ecosystem, and finally transaction history with bridge onboarding. Each phase delivers a coherent, testable capability. Phases 1-4 produce a standalone wallet. Phases 5-9 add the features that make it categorically better than MetaMask on megaETH.
 
 ## Phases
 

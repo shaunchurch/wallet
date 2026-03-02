@@ -1,4 +1,4 @@
-# MegaWallet
+# Vibe Wallet
 
 ## What This Is
 

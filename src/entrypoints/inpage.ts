@@ -2,10 +2,10 @@
 // EIP-1193 provider + EIP-6963 announcement
 export {}; // TS module isolation (builds as IIFE)
 
-const CHANNEL = 'megawallet-provider';
+const CHANNEL = 'vibewallet-provider';
 
 // ---------------------------------------------------------------------------
-// MegaWalletProvider (EIP-1193)
+// VibeWalletProvider (EIP-1193)
 // Mutable state lives in closures so Object.freeze() doesn't block mutations.
 // ---------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ function _handleResponse(
   }
 }
 
-const megaWalletProvider = {
+const vibeWalletProvider = {
   isMetaMask: false as const,
 
   async request({ method, params }: { method: string; params?: unknown[] }): Promise<unknown> {
@@ -73,7 +73,7 @@ const megaWalletProvider = {
 // Create frozen instance (DAPP-11: no mutable state exposed)
 // ---------------------------------------------------------------------------
 
-const provider = Object.freeze(megaWalletProvider);
+const provider = Object.freeze(vibeWalletProvider);
 
 // ---------------------------------------------------------------------------
 // Response listener (content script -> inpage)
@@ -114,9 +114,9 @@ try {
 
 const providerInfo = {
   uuid: crypto.randomUUID(),
-  name: 'megawallet',
-  icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="%2318181b"/><text x="16" y="22" text-anchor="middle" fill="white" font-size="18" font-family="monospace">M</text></svg>',
-  rdns: 'com.megawallet',
+  name: 'vibewallet',
+  icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="%2318181b"/><text x="16" y="22" text-anchor="middle" fill="white" font-size="18" font-family="monospace">V</text></svg>',
+  rdns: 'com.vibewallet',
 };
 
 const detail = Object.freeze({ info: Object.freeze(providerInfo), provider });

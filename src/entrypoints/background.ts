@@ -733,7 +733,8 @@ async function handleDappRpc(
         },
       };
     }
-    // eth_sign enabled -- treat as approval (falls through)
+    // eth_sign enabled -- route to approval handler
+    return handleApprovalRpc(msg, senderTabId);
   }
 
   // Direct methods -- handle locally or proxy to RPC
@@ -742,11 +743,7 @@ async function handleDappRpc(
   }
 
   // Approval methods -- pending request + popup flow
-  if (category === 'approval') {
-    return handleApprovalRpc(msg, senderTabId);
-  }
-
-  return { error: RPC_ERRORS.UNSUPPORTED };
+  return handleApprovalRpc(msg, senderTabId);
 }
 
 async function handleDirectRpc(msg: DappRpcRequest): Promise<DappRpcResponse> {
@@ -767,7 +764,7 @@ async function handleDirectRpc(msg: DappRpcRequest): Promise<DappRpcResponse> {
       return { result: String(chainId) };
     }
     case 'web3_clientVersion': {
-      return { result: 'megawallet/0.1.0' };
+      return { result: 'vibewallet/0.1.0' };
     }
     case 'wallet_switchEthereumChain': {
       // DAPP-08: accept megaETH chains only
@@ -790,7 +787,7 @@ async function handleDirectRpc(msg: DappRpcRequest): Promise<DappRpcResponse> {
       return {
         error: {
           code: 4902,
-          message: `megawallet only supports megaETH mainnet (${mainnetId}) and testnet (${testnetId}). Add the chain to a multi-chain wallet like MetaMask.`,
+          message: `vibewallet only supports megaETH mainnet (${mainnetId}) and testnet (${testnetId}). Add the chain to a multi-chain wallet like MetaMask.`,
         },
       };
     }
@@ -882,6 +879,7 @@ async function handleApprovalRpc(
     case 'eth_sendTransaction':
       return handleDappSendTransaction(msg, senderTabId);
     case 'personal_sign':
+    case 'eth_sign':
       return handleDappPersonalSign(msg, senderTabId);
     case 'eth_signTypedData_v4':
       return handleDappSignTypedData(msg, senderTabId);
@@ -1077,6 +1075,10 @@ async function handleDappExecuteTx(
     maxPriorityFeePerGas?: string | undefined;
   },
 ): Promise<WalletResponse> {
+  // Require matching pending request — enforces approval gate
+  const pending = await removePendingRequest(requestId);
+  if (!pending) return { type: 'wallet:error', error: 'No matching pending request' };
+
   const session = await getSession();
   if (!session) return { type: 'wallet:error', error: 'Wallet is locked' };
   const network = await getNetworkPreference();
@@ -1087,13 +1089,10 @@ async function handleDappExecuteTx(
   );
   if (accountIndex === -1) return { type: 'wallet:error', error: 'Account not found' };
 
-  // Re-verify account authorization for this origin (defense in depth)
-  const pending = await getLatestPendingRequest();
-  if (pending) {
-    const site = await getConnectedSite(pending.origin);
-    if (site && !site.accounts.some((a) => a.toLowerCase() === txParams.from.toLowerCase())) {
-      return { type: 'wallet:error', error: 'Account not authorized for this site' };
-    }
+  // Verify account is authorized for the requesting origin
+  const site = await getConnectedSite(pending.origin);
+  if (site && !site.accounts.some((a) => a.toLowerCase() === txParams.from.toLowerCase())) {
+    return { type: 'wallet:error', error: 'Account not authorized for this site' };
   }
 
   const seed = hexToBytes(session.seed);
@@ -1144,14 +1143,26 @@ async function handleDappExecuteTx(
     }
 
     // Resolve the pending dapp request with the txHash
-    resolveRequest(requestId, txHash);
-    await removePendingRequest(requestId);
+    const resolved = resolveRequest(requestId, txHash);
+    if (!resolved && pending.tabId) {
+      chrome.tabs.sendMessage(pending.tabId, {
+        type: 'dapp:rpcResponse',
+        rpcId: pending.rpcId,
+        result: txHash,
+      });
+    }
 
     return { type: 'dapp:txSent', txHash };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Transaction failed';
-    rejectRequest(requestId, { code: -32603, message: error });
-    await removePendingRequest(requestId);
+    const rejected = rejectRequest(requestId, { code: -32603, message: error });
+    if (!rejected && pending.tabId) {
+      chrome.tabs.sendMessage(pending.tabId, {
+        type: 'dapp:rpcResponse',
+        rpcId: pending.rpcId,
+        error: { code: -32603, message: error },
+      });
+    }
     return { type: 'wallet:error', error };
   }
 }
@@ -1161,6 +1172,9 @@ async function handleDappExecutePersonalSign(
   message: string,
   account: string,
 ): Promise<WalletResponse> {
+  const pending = await removePendingRequest(requestId);
+  if (!pending) return { type: 'wallet:error', error: 'No matching pending request' };
+
   const session = await getSession();
   if (!session) return { type: 'wallet:error', error: 'Wallet is locked' };
 
@@ -1178,14 +1192,26 @@ async function handleDappExecutePersonalSign(
     const { eip191Signer } = await import('micro-eth-signer');
     const signature = eip191Signer.sign(message, kp.privateKey);
 
-    resolveRequest(requestId, signature);
-    await removePendingRequest(requestId);
+    const resolved = resolveRequest(requestId, signature);
+    if (!resolved && pending.tabId) {
+      chrome.tabs.sendMessage(pending.tabId, {
+        type: 'dapp:rpcResponse',
+        rpcId: pending.rpcId,
+        result: signature,
+      });
+    }
 
     return { type: 'dapp:signed', signature };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Signing failed';
-    rejectRequest(requestId, { code: -32603, message: error });
-    await removePendingRequest(requestId);
+    const rejected = rejectRequest(requestId, { code: -32603, message: error });
+    if (!rejected && pending.tabId) {
+      chrome.tabs.sendMessage(pending.tabId, {
+        type: 'dapp:rpcResponse',
+        rpcId: pending.rpcId,
+        error: { code: -32603, message: error },
+      });
+    }
     return { type: 'wallet:error', error };
   }
 }
@@ -1195,6 +1221,9 @@ async function handleDappExecuteSignTypedData(
   typedData: unknown,
   account: string,
 ): Promise<WalletResponse> {
+  const pending = await removePendingRequest(requestId);
+  if (!pending) return { type: 'wallet:error', error: 'No matching pending request' };
+
   const session = await getSession();
   if (!session) return { type: 'wallet:error', error: 'Wallet is locked' };
 
@@ -1212,14 +1241,26 @@ async function handleDappExecuteSignTypedData(
     const { signTyped } = await import('micro-eth-signer');
     const signature = signTyped(typedData as Parameters<typeof signTyped>[0], kp.privateKey);
 
-    resolveRequest(requestId, signature);
-    await removePendingRequest(requestId);
+    const resolved = resolveRequest(requestId, signature);
+    if (!resolved && pending.tabId) {
+      chrome.tabs.sendMessage(pending.tabId, {
+        type: 'dapp:rpcResponse',
+        rpcId: pending.rpcId,
+        result: signature,
+      });
+    }
 
     return { type: 'dapp:signed', signature };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Signing failed';
-    rejectRequest(requestId, { code: -32603, message: error });
-    await removePendingRequest(requestId);
+    const rejected = rejectRequest(requestId, { code: -32603, message: error });
+    if (!rejected && pending.tabId) {
+      chrome.tabs.sendMessage(pending.tabId, {
+        type: 'dapp:rpcResponse',
+        rpcId: pending.rpcId,
+        error: { code: -32603, message: error },
+      });
+    }
     return { type: 'wallet:error', error };
   }
 }
@@ -1250,8 +1291,8 @@ async function handleDappSimulate(txParams: {
       const error = err instanceof Error ? err.message : 'Simulation failed';
       return {
         type: 'dapp:simulated',
-        ethBefore: `0x${ethBefore.toString(16)}`,
-        ethAfter: `0x${ethBefore.toString(16)}`,
+        ethBefore: formatEth(ethBefore),
+        ethAfter: formatEth(ethBefore),
         success: false,
         error,
       };
@@ -1262,16 +1303,16 @@ async function handleDappSimulate(txParams: {
     const ethAfter = ethBefore - valueBigInt;
     return {
       type: 'dapp:simulated',
-      ethBefore: `0x${ethBefore.toString(16)}`,
-      ethAfter: `0x${ethAfter.toString(16)}`,
+      ethBefore: formatEth(ethBefore),
+      ethAfter: formatEth(ethAfter),
       success: true,
     };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Simulation failed';
     return {
       type: 'dapp:simulated',
-      ethBefore: '0x0',
-      ethAfter: '0x0',
+      ethBefore: '0',
+      ethAfter: '0',
       success: false,
       error,
     };
@@ -1304,8 +1345,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 // Service worker initialization
 // ---------------------------------------------------------------------------
 
-console.log('[megawallet] background service worker started');
+console.log('[vibewallet] background service worker started');
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('[megawallet] extension installed');
+  console.log('[vibewallet] extension installed');
 });

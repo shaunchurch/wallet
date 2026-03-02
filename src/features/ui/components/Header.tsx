@@ -188,7 +188,7 @@ export function Header() {
   return (
     <header className="flex items-center justify-between border-b border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950">
       <span className="font-mono text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-        megawallet
+        vibewallet
       </span>
       <ThemeToggle />
     </header>

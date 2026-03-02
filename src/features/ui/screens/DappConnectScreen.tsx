@@ -106,15 +106,20 @@ export function DappConnectScreen() {
             <button
               key={account.address}
               type="button"
+              role="checkbox"
+              aria-checked={selected.has(idx)}
               onClick={() => toggleAccount(idx)}
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
             >
-              <input
-                type="checkbox"
-                checked={selected.has(idx)}
-                onChange={() => toggleAccount(idx)}
-                className="size-4 rounded border-zinc-300 accent-zinc-900 dark:accent-zinc-100"
-              />
+              <span
+                className={`flex size-4 shrink-0 items-center justify-center rounded border ${selected.has(idx) ? 'border-zinc-900 bg-zinc-900 dark:border-zinc-100 dark:bg-zinc-100' : 'border-zinc-300 dark:border-zinc-600'}`}
+              >
+                {selected.has(idx) && (
+                  <svg aria-hidden="true" viewBox="0 0 12 12" className="size-3 text-white dark:text-zinc-900">
+                    <path d="M10 3L4.5 8.5 2 6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </span>
               <Jazzicon address={account.address} size={24} />
               <div className="text-left">
                 <p className="text-sm font-medium">{accountNames[idx] || `Account ${idx + 1}`}</p>

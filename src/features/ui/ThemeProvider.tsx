@@ -18,7 +18,7 @@ function getSystemTheme(): Theme {
 
 function getStoredTheme(): Theme | null {
   try {
-    const stored = localStorage.getItem('megawallet-theme');
+    const stored = localStorage.getItem('vibewallet-theme');
     if (stored === 'light' || stored === 'dark') return stored;
   } catch {
     // localStorage may be unavailable in some contexts
@@ -32,7 +32,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
     try {
-      localStorage.setItem('megawallet-theme', theme);
+      localStorage.setItem('vibewallet-theme', theme);
     } catch {
       // ignore
     }

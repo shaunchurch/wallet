@@ -51,7 +51,7 @@ if (isWatch) {
   ]);
 
   await Promise.all([bgCtx.watch(), contentCtx.watch(), inpageCtx.watch(), popupCtx.watch()]);
-  console.log('[megawallet] watching for changes...');
+  console.log('[vibewallet] watching for changes...');
 } else {
   // One-shot build
   await Promise.all([
@@ -89,4 +89,4 @@ cpSync('public/manifest.json', 'dist/manifest.json');
 cpSync('public/popup.html', 'dist/popup.html');
 cpSync('public/icons', 'dist/icons', { recursive: true });
 
-console.log('[megawallet] build complete');
+console.log('[vibewallet] build complete');

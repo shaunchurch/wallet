@@ -1,4 +1,4 @@
-# Requirements: MegaWallet
+# Requirements: Vibe Wallet
 
 **Defined:** 2026-03-01
 **Core Value:** Transactions confirm instantly and balances update in real time. The fastest chain gets the fastest wallet.
