@@ -18,14 +18,16 @@ export function SendAmountScreen() {
   const [primaryMode, setPrimaryMode] = useState<'eth' | 'usd'>('eth');
   const [error, setError] = useState<string | null>(null);
   const [loadingMax, setLoadingMax] = useState(false);
+  const [estimatedGasWei, setEstimatedGasWei] = useState<bigint | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch balance + price on mount
+  // Fetch balance + price + gas estimate on mount
   useEffect(() => {
     Promise.all([
       sendWalletMessage({ type: 'wallet:getBalance', accountIndex: activeAccountIndex }),
       sendWalletMessage({ type: 'wallet:getEthPrice' }),
-    ]).then(([balResp, priceResp]) => {
+      sendWalletMessage({ type: 'wallet:estimateGas', to: sendTo, value: '0x0', accountIndex: activeAccountIndex }),
+    ]).then(([balResp, priceResp, gasResp]) => {
       if (balResp.type === 'wallet:balance') {
         setBalanceWei(BigInt(balResp.balanceWei));
         setBalanceEth(balResp.balanceEth);
@@ -33,18 +35,22 @@ export function SendAmountScreen() {
       if (priceResp.type === 'wallet:ethPrice') {
         setEthPrice(priceResp.usd);
       }
+      if (gasResp.type === 'wallet:gasEstimate') {
+        setEstimatedGasWei(BigInt(gasResp.gasLimit) * BigInt(gasResp.maxFeePerGas));
+      }
     });
-  }, [activeAccountIndex]);
+  }, [activeAccountIndex, sendTo]);
 
   // Auto-focus
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // Parse input to ETH amount based on mode
+  // Parse input to ETH amount (for display only — use getWei() for precision)
   function getEthAmount(): number {
     const val = Number.parseFloat(ethInput || '0');
-    if (primaryMode === 'usd' && ethPrice && ethPrice > 0) {
+    if (primaryMode === 'usd') {
+      if (!ethPrice || ethPrice <= 0) return 0;
       return val / ethPrice;
     }
     return val;
@@ -52,7 +58,14 @@ export function SendAmountScreen() {
 
   function getWei(): bigint {
     try {
-      const ethAmt = getEthAmount();
+      if (!ethInput || ethInput === '.') return 0n;
+      if (primaryMode === 'eth') {
+        // String-based: no float intermediate, lossless to 18 decimals
+        return parseEthToWei(ethInput);
+      }
+      // USD mode: float division is inherent (fiat precision ~2 decimals)
+      if (!ethPrice || ethPrice <= 0) return 0n;
+      const ethAmt = Number.parseFloat(ethInput) / ethPrice;
       if (ethAmt <= 0 || Number.isNaN(ethAmt)) return 0n;
       return parseEthToWei(ethAmt.toFixed(18));
     } catch {
@@ -60,10 +73,13 @@ export function SendAmountScreen() {
     }
   }
 
-  // Validation
+  // Validation (gas-aware per plan requirement)
   function validate(wei: bigint): string | null {
     if (wei <= 0n) return null; // don't show error for empty input
-    if (balanceWei != null && wei > balanceWei) return 'Insufficient balance';
+    if (balanceWei == null) return null;
+    if (wei > balanceWei) return 'Insufficient balance';
+    if (estimatedGasWei != null && wei + estimatedGasWei > balanceWei)
+      return 'Insufficient balance for gas';
     return null;
   }
 

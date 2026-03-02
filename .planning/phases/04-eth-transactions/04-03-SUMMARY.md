@@ -120,6 +120,30 @@ completed: 2026-03-01
 ## Issues Encountered
 - Pre-existing lint formatting errors in Sidebar.tsx, AboutScreen.tsx, SettingsScreen.tsx, store.ts, test files from prior phases. Out of scope per deviation rules.
 
+## Post-Review Fixes (2026-03-02)
+
+Code review identified 4 bugs (2×P1, 1×P2, 1×P3). All fixed:
+
+**P1: USD input silently treated as ETH when price unavailable**
+- `getEthAmount()` fell through to return raw USD value as ETH when `ethPrice` was null/0
+- Fix: return 0 when USD mode and price unavailable
+
+**P1: parseFloat precision loss in wei conversion**
+- ETH mode round-tripped through `parseFloat→toFixed(18)→parseEthToWei`, losing precision for high-decimal inputs
+- Fix: pass `ethInput` string directly to `parseEthToWei()` in ETH mode (lossless). USD mode retains float division (inherent to fiat, acceptable)
+
+**P2: Amount validation ignores gas for non-Max flows**
+- Plan required `amount + gas <= balance` validation; only `amount <= balance` was checked
+- Fix: fetch gas estimate on mount, validate `amount + estimatedGas > balance` → "Insufficient balance for gas"
+
+**P3: BalanceDisplay float-based precision drift**
+- `BigInt(Math.round(parseFloat(balanceEth) * 1e18))` lost precision for exact wei values
+- Fix: use `parseEthToWei(balanceEth)` for lossless string→bigint conversion
+
+**Review findings not actioned:**
+- TEST-03 signed-hex comparison: unsigned RLP match is correct (signing uses extraEntropy → non-deterministic signed hex)
+- Checkpoint state: process/doc issue, not code defect
+
 ## User Setup Required
 None - no external service configuration required.
 
@@ -135,3 +159,4 @@ All 6 created files verified present. Both task commits (7e95234, 15f96dc) verif
 ---
 *Phase: 04-eth-transactions*
 *Completed: 2026-03-01*
+*Reviewed: 2026-03-02*

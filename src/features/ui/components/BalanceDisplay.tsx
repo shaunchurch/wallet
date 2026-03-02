@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { sendWalletMessage } from '@/features/wallet/messages';
 import { useWalletStore } from '@/features/wallet/store';
-import { formatEth, formatUsd } from '@/features/wallet/tx/format';
+import { formatEth, formatUsd, parseEthToWei } from '@/features/wallet/tx/format';
 
 export function BalanceDisplay() {
   const activeAccountIndex = useWalletStore((s) => s.activeAccountIndex);
@@ -45,7 +45,7 @@ export function BalanceDisplay() {
     );
   }
 
-  const ethBigint = balanceEth ? BigInt(Math.round(Number.parseFloat(balanceEth) * 1e18)) : 0n;
+  const ethBigint = balanceEth ? parseEthToWei(balanceEth) : 0n;
   const ethFormatted = formatEth(ethBigint);
   const fiatAmount =
     balanceEth != null && ethPrice != null ? Number.parseFloat(balanceEth) * ethPrice : 0;
