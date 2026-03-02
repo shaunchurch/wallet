@@ -4,6 +4,14 @@ A Chrome extension wallet for megaETH, built from scratch with React, TypeScript
 
 > **WARNING: This is an experimental project for educational and entertainment purposes only. Do NOT use this wallet on mainnet with real funds. There is no warranty, no audit, and no guarantee of security. You will lose your money. Seriously.**
 
+## Screenshots
+
+<p align="center">
+  <img src="public/screenshots/main.png" width="200" alt="Main balance screen" />
+  <img src="public/screenshots/send-confirm.png" width="200" alt="Send confirmation" />
+  <img src="public/screenshots/send-result.png" width="200" alt="Transaction sent" />
+</p>
+
 ## What is this
 
 A fully functional browser extension wallet that talks to megaETH (the real-time Ethereum L2). It handles key generation, transaction signing, gas estimation, dapp connectivity, and a 4-screen send flow — all in ~1.4mb.
