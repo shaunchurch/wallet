@@ -45,7 +45,7 @@ export function DappConnectScreen() {
   const accounts = useWalletStore((s) => s.accounts);
   const accountNames = useWalletStore((s) => s.accountNames);
 
-  const [selected, setSelected] = useState<Set<number>>(() => new Set(accounts.map((_, i) => i)));
+  const [selected, setSelected] = useState<Set<number>>(() => new Set([0]));
   const [loading, setLoading] = useState(false);
 
   if (!pendingDappRequest) {
