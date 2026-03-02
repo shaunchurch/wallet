@@ -6,71 +6,74 @@ const CHANNEL = 'megawallet-provider';
 
 // ---------------------------------------------------------------------------
 // MegaWalletProvider (EIP-1193)
+// Mutable state lives in closures so Object.freeze() doesn't block mutations.
 // ---------------------------------------------------------------------------
 
-class MegaWalletProvider {
-  readonly isMetaMask = false;
+const _listeners = new Map<string, Set<(...args: unknown[]) => void>>();
+let _requestId = 0;
+const _pendingRequests = new Map<
+  number,
+  { resolve: (r: unknown) => void; reject: (e: Error) => void }
+>();
 
-  private _listeners = new Map<string, Set<(...args: unknown[]) => void>>();
-  private _requestId = 0;
-  private _pendingRequests = new Map<
-    number,
-    { resolve: (r: unknown) => void; reject: (e: Error) => void }
-  >();
-
-  async request({ method, params }: { method: string; params?: unknown[] }): Promise<unknown> {
-    const id = ++this._requestId;
-    return new Promise<unknown>((resolve, reject) => {
-      this._pendingRequests.set(id, { resolve, reject });
-      window.postMessage({ channel: CHANNEL, direction: 'to-background', id, method, params }, '*');
-    });
-  }
-
-  on(event: string, listener: (...args: unknown[]) => void): void {
-    let set = this._listeners.get(event);
-    if (!set) {
-      set = new Set();
-      this._listeners.set(event, set);
-    }
-    set.add(listener);
-  }
-
-  removeListener(event: string, listener: (...args: unknown[]) => void): void {
-    this._listeners.get(event)?.delete(listener);
-  }
-
-  /** @internal -- called by message listener */
-  _emit(event: string, ...args: unknown[]): void {
-    const set = this._listeners.get(event);
-    if (!set) return;
-    for (const fn of set) {
-      try {
-        fn(...args);
-      } catch {
-        // listener errors must not break the provider
-      }
-    }
-  }
-
-  /** @internal -- called by message listener */
-  _handleResponse(id: number, result: unknown, error?: { code: number; message: string }): void {
-    const pending = this._pendingRequests.get(id);
-    if (!pending) return;
-    this._pendingRequests.delete(id);
-    if (error) {
-      const err = Object.assign(new Error(error.message), { code: error.code });
-      pending.reject(err);
-    } else {
-      pending.resolve(result);
+function _emit(event: string, ...args: unknown[]): void {
+  const set = _listeners.get(event);
+  if (!set) return;
+  for (const fn of set) {
+    try {
+      fn(...args);
+    } catch {
+      // listener errors must not break the provider
     }
   }
 }
+
+function _handleResponse(
+  id: number,
+  result: unknown,
+  error?: { code: number; message: string },
+): void {
+  const pending = _pendingRequests.get(id);
+  if (!pending) return;
+  _pendingRequests.delete(id);
+  if (error) {
+    const err = Object.assign(new Error(error.message), { code: error.code });
+    pending.reject(err);
+  } else {
+    pending.resolve(result);
+  }
+}
+
+const megaWalletProvider = {
+  isMetaMask: false as const,
+
+  async request({ method, params }: { method: string; params?: unknown[] }): Promise<unknown> {
+    const id = ++_requestId;
+    return new Promise<unknown>((resolve, reject) => {
+      _pendingRequests.set(id, { resolve, reject });
+      window.postMessage({ channel: CHANNEL, direction: 'to-background', id, method, params }, '*');
+    });
+  },
+
+  on(event: string, listener: (...args: unknown[]) => void): void {
+    let set = _listeners.get(event);
+    if (!set) {
+      set = new Set();
+      _listeners.set(event, set);
+    }
+    set.add(listener);
+  },
+
+  removeListener(event: string, listener: (...args: unknown[]) => void): void {
+    _listeners.get(event)?.delete(listener);
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Create frozen instance (DAPP-11: no mutable state exposed)
 // ---------------------------------------------------------------------------
 
-const provider = Object.freeze(new MegaWalletProvider());
+const provider = Object.freeze(megaWalletProvider);
 
 // ---------------------------------------------------------------------------
 // Response listener (content script -> inpage)
@@ -83,12 +86,12 @@ window.addEventListener('message', (event) => {
 
   // Event-type messages (accountsChanged, chainChanged, etc.)
   if (event.data.event) {
-    provider._emit(event.data.event, event.data.data);
+    _emit(event.data.event, event.data.data);
     return;
   }
 
   // RPC response
-  provider._handleResponse(event.data.id, event.data.result, event.data.error);
+  _handleResponse(event.data.id, event.data.result, event.data.error);
 });
 
 // ---------------------------------------------------------------------------
