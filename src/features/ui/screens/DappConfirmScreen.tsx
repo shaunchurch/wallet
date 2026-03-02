@@ -21,24 +21,24 @@ function SiteInfo({
   origin: string;
 }) {
   return (
-    <div className="flex items-center gap-3 px-4 py-3">
+    <div className="flex items-center gap-3 px-4 py-3 min-w-0">
       {favicon ? (
         <img
           src={favicon}
           alt=""
-          className="size-8 rounded"
+          className="size-8 shrink-0 rounded"
           onError={(e) => {
             e.currentTarget.style.display = 'none';
           }}
         />
       ) : (
-        <div className="flex size-8 items-center justify-center rounded bg-zinc-200 text-xs font-bold dark:bg-zinc-700">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded bg-zinc-200 text-xs font-bold dark:bg-zinc-700">
           {(title || origin).charAt(0).toUpperCase()}
         </div>
       )}
-      <div>
-        <p className="text-sm font-semibold">{title || new URL(origin).hostname}</p>
-        <p className="text-xs text-zinc-400">{origin}</p>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold">{title || new URL(origin).hostname}</p>
+        <p className="truncate text-xs text-zinc-400">{origin}</p>
       </div>
     </div>
   );

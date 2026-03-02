@@ -19,7 +19,7 @@ function SiteInfo({
   origin: string;
 }) {
   return (
-    <div className="flex flex-col items-center gap-2 px-4 py-4">
+    <div className="flex flex-col items-center gap-2 px-6 py-4">
       {favicon ? (
         <img
           src={favicon}
@@ -34,8 +34,8 @@ function SiteInfo({
           {(title || origin).charAt(0).toUpperCase()}
         </div>
       )}
-      <p className="text-sm font-semibold">{title || new URL(origin).hostname}</p>
-      <p className="text-xs text-zinc-400">{origin}</p>
+      <p className="max-w-full truncate text-sm font-semibold">{title || new URL(origin).hostname}</p>
+      <p className="max-w-full truncate text-xs text-zinc-400">{origin}</p>
     </div>
   );
 }
