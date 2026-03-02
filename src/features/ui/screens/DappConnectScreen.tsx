@@ -34,7 +34,9 @@ function SiteInfo({
           {(title || origin).charAt(0).toUpperCase()}
         </div>
       )}
-      <p className="max-w-full truncate text-sm font-semibold">{title || new URL(origin).hostname}</p>
+      <p className="max-w-full truncate text-sm font-semibold">
+        {title || new URL(origin).hostname}
+      </p>
       <p className="max-w-full truncate text-xs text-zinc-400">{origin}</p>
     </div>
   );
@@ -115,8 +117,19 @@ export function DappConnectScreen() {
                 className={`flex size-4 shrink-0 items-center justify-center rounded border ${selected.has(idx) ? 'border-zinc-900 bg-zinc-900 dark:border-zinc-100 dark:bg-zinc-100' : 'border-zinc-300 dark:border-zinc-600'}`}
               >
                 {selected.has(idx) && (
-                  <svg aria-hidden="true" viewBox="0 0 12 12" className="size-3 text-white dark:text-zinc-900">
-                    <path d="M10 3L4.5 8.5 2 6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 12 12"
+                    className="size-3 text-white dark:text-zinc-900"
+                  >
+                    <path
+                      d="M10 3L4.5 8.5 2 6"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
               </span>
