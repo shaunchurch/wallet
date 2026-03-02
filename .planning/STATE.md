@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-02T09:41:40Z"
+last_updated: "2026-03-02T10:30:00Z"
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 5 of 9 (Dapp Provider & Connectivity)
-Plan: 2 of 3 in current phase (05-02 complete)
-Status: Executing Phase 5
-Last activity: 2026-03-02 -- Plan 05-02 executed
+Plan: 3 of 3 in current phase (all complete)
+Status: Phase 5 execution complete, verifying
+Last activity: 2026-03-02 -- Plan 05-03 executed + visual verification approved
 
-Progress: [█████████░] 54%
+Progress: [██████████] 56%
 
 ## Performance Metrics
 
@@ -44,7 +44,7 @@ Progress: [█████████░] 54%
 | 02 | 3 | 14min | 5min |
 | 03 | 3 | 17min | 6min |
 | 04 | 3 | 52min | 17min |
-| 05 | 2/3 | 8min | 4min |
+| 05 | 3/3 | 30min | 10min |
 
 **Recent Trend:**
 - Last 5 plans: 04-02(4m), 04-03(27m), 05-01(4m), 05-02(4m)
@@ -105,6 +105,10 @@ Recent decisions affecting current work:
 - [Phase 05]: 05-02: Dynamic import for eip191Signer and signTyped (clean top-level imports)
 - [Phase 05]: 05-02: Defense-in-depth: re-verify account auth in dapp:executeTx handler
 - [Phase 05]: 05-02: dapp: prefixed messages accepted by wallet listener alongside wallet: prefix
+- [Phase 05]: 05-03: Provider mutable state in closures, not class properties (Object.freeze compat)
+- [Phase 05]: 05-03: Single onMessage listener — dapp:rpc before origin guard (two listeners caused race)
+- [Phase 05]: 05-03: Default first account only in dapp connect (not all)
+- [Phase 05]: 05-03: Connection indicator dot-only (no text label, 360px too narrow)
 
 ### Pending Todos
 
@@ -117,5 +121,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 05-02-PLAN.md (approval flow infrastructure)
+Stopped at: Phase 05 all plans complete, verifying
 Resume file: None
