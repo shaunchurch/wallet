@@ -1,7 +1,19 @@
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js';
-import { getConnectedSite } from '@/features/dapp/connections';
+import { addConnectedSite, getConnectedSite } from '@/features/dapp/connections';
+import type { PendingDappRequest } from '@/features/dapp/pending';
+import {
+  clearPendingRequests,
+  getLatestPendingRequest,
+  getPendingRequests,
+  registerCallback,
+  rejectRequest,
+  removePendingRequest,
+  resolveRequest,
+  storePendingRequest,
+} from '@/features/dapp/pending';
 import { getMethodCategory } from '@/features/dapp/rpc-whitelist';
 import type { DappRpcRequest, DappRpcResponse } from '@/features/dapp/types';
+import { RPC_ERRORS } from '@/features/dapp/types';
 import {
   createLockoutManager,
   decryptVault,
@@ -226,6 +238,57 @@ export async function handleWalletMessage(msg: WalletMessage): Promise<WalletRes
         return await handleGetEthPrice();
       case 'wallet:sendTransaction':
         return await handleSendTransaction(msg.to, msg.value, msg.accountIndex);
+      // Dapp popup message handlers
+      case 'dapp:approve': {
+        // Always remove pending regardless of callback existence
+        const pendingReq = await removePendingRequest(msg.requestId);
+        const resolved = resolveRequest(msg.requestId, msg.result);
+        if (!resolved && pendingReq?.tabId) {
+          // SW restarted -- callback lost. Send response to content script via tab.
+          chrome.tabs.sendMessage(pendingReq.tabId, {
+            type: 'dapp:rpcResponse',
+            rpcId: pendingReq.rpcId,
+            result: msg.result,
+          });
+        }
+        // If this was eth_requestAccounts, save the connected site
+        if (pendingReq?.method === 'eth_requestAccounts') {
+          const accounts = Array.isArray(msg.result) ? (msg.result as string[]) : [];
+          await addConnectedSite({
+            origin: pendingReq.origin,
+            favicon: pendingReq.favicon ?? `${pendingReq.origin}/favicon.ico`,
+            name: pendingReq.title ?? pendingReq.origin,
+            accounts,
+            connectedAt: Date.now(),
+          });
+        }
+        return { type: 'dapp:approved' };
+      }
+      case 'dapp:reject': {
+        const pendingReq2 = await removePendingRequest(msg.requestId);
+        const rejected = rejectRequest(msg.requestId, RPC_ERRORS.USER_REJECTED);
+        if (!rejected && pendingReq2?.tabId) {
+          // SW restarted -- callback lost. Send rejection to content script via tab.
+          chrome.tabs.sendMessage(pendingReq2.tabId, {
+            type: 'dapp:rpcResponse',
+            rpcId: pendingReq2.rpcId,
+            error: RPC_ERRORS.USER_REJECTED,
+          });
+        }
+        return { type: 'dapp:rejected' };
+      }
+      case 'dapp:getPendingRequest': {
+        const req = await getLatestPendingRequest();
+        return { type: 'dapp:pendingRequest', request: req };
+      }
+      case 'dapp:executeTx':
+        return await handleDappExecuteTx(msg.requestId, msg.txParams);
+      case 'dapp:signPersonal':
+        return await handleDappExecutePersonalSign(msg.requestId, msg.message, msg.account);
+      case 'dapp:signTypedData':
+        return await handleDappExecuteSignTypedData(msg.requestId, msg.typedData, msg.account);
+      case 'dapp:simulate':
+        return await handleDappSimulate(msg.txParams);
       default:
         return { type: 'wallet:error', error: 'Unknown message type' };
     }
@@ -647,7 +710,10 @@ async function handleSendTransaction(
 // Dapp RPC handler (DAPP-07 through DAPP-10)
 // ---------------------------------------------------------------------------
 
-async function handleDappRpc(msg: DappRpcRequest): Promise<DappRpcResponse> {
+async function handleDappRpc(
+  msg: DappRpcRequest,
+  senderTabId?: number | undefined,
+): Promise<DappRpcResponse> {
   const category = getMethodCategory(msg.method);
 
   // Unknown method
@@ -675,10 +741,12 @@ async function handleDappRpc(msg: DappRpcRequest): Promise<DappRpcResponse> {
     return handleDirectRpc(msg);
   }
 
-  // Approval methods -- will be implemented in plan 05-02
-  return {
-    error: { code: 4200, message: `Method ${msg.method} requires approval (not yet implemented)` },
-  };
+  // Approval methods -- pending request + popup flow
+  if (category === 'approval') {
+    return handleApprovalRpc(msg, senderTabId);
+  }
+
+  return { error: RPC_ERRORS.UNSUPPORTED };
 }
 
 async function handleDirectRpc(msg: DappRpcRequest): Promise<DappRpcResponse> {
@@ -740,6 +808,477 @@ async function handleDirectRpc(msg: DappRpcRequest): Promise<DappRpcResponse> {
 }
 
 // ---------------------------------------------------------------------------
+// Approval popup helpers
+// ---------------------------------------------------------------------------
+
+let approvalWindowId: number | null = null;
+
+async function openApprovalPopup(): Promise<void> {
+  // If there's already an approval popup, focus it
+  if (approvalWindowId !== null) {
+    try {
+      await chrome.windows.update(approvalWindowId, { focused: true });
+      return;
+    } catch {
+      approvalWindowId = null; // window was closed
+    }
+  }
+
+  const popup = await chrome.windows.create({
+    url: chrome.runtime.getURL('popup.html'),
+    type: 'popup',
+    width: 360,
+    height: 620,
+    focused: true,
+  });
+
+  if (!popup) return;
+  approvalWindowId = popup.id ?? null;
+
+  // Listen for window close -> reject all pending requests
+  if (popup.id) {
+    chrome.windows.onRemoved.addListener(function onClose(windowId) {
+      if (windowId !== approvalWindowId) return;
+      chrome.windows.onRemoved.removeListener(onClose);
+      approvalWindowId = null;
+      rejectAllPendingOnClose();
+    });
+  }
+}
+
+async function rejectAllPendingOnClose(): Promise<void> {
+  const reqs = await getPendingRequests();
+  for (const req of reqs) {
+    const rejected = rejectRequest(req.id, RPC_ERRORS.USER_REJECTED);
+    if (!rejected && req.tabId) {
+      // SW callback lost -- send rejection via tab fallback
+      chrome.tabs.sendMessage(req.tabId, {
+        type: 'dapp:rpcResponse',
+        rpcId: req.rpcId,
+        error: RPC_ERRORS.USER_REJECTED,
+      });
+    }
+  }
+  await clearPendingRequests();
+}
+
+// ---------------------------------------------------------------------------
+// Approval method router
+// ---------------------------------------------------------------------------
+
+async function handleApprovalRpc(
+  msg: DappRpcRequest,
+  senderTabId?: number | undefined,
+): Promise<DappRpcResponse> {
+  // Check wallet is unlocked for all approval methods
+  const session = await getSession();
+  if (!session) {
+    return { error: { code: 4100, message: 'Wallet is locked' } };
+  }
+
+  switch (msg.method) {
+    case 'eth_requestAccounts':
+      return handleDappConnect(msg, senderTabId);
+    case 'eth_sendTransaction':
+      return handleDappSendTransaction(msg, senderTabId);
+    case 'personal_sign':
+      return handleDappPersonalSign(msg, senderTabId);
+    case 'eth_signTypedData_v4':
+      return handleDappSignTypedData(msg, senderTabId);
+    default:
+      return { error: RPC_ERRORS.UNSUPPORTED };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// eth_requestAccounts handler
+// ---------------------------------------------------------------------------
+
+async function handleDappConnect(
+  msg: DappRpcRequest,
+  senderTabId?: number | undefined,
+): Promise<DappRpcResponse> {
+  // Check if already connected
+  const existing = await getConnectedSite(msg.origin);
+  if (existing && existing.accounts.length > 0) {
+    return { result: existing.accounts };
+  }
+
+  // Need user approval -- create pending request and open popup
+  return new Promise((resolve) => {
+    const reqId = crypto.randomUUID();
+    const pending: PendingDappRequest = {
+      id: reqId,
+      rpcId: msg.id,
+      method: msg.method,
+      params: msg.params,
+      origin: msg.origin,
+      favicon: msg.favicon,
+      title: msg.title,
+      tabId: senderTabId,
+      createdAt: Date.now(),
+    };
+
+    registerCallback(
+      reqId,
+      (result) => resolve({ result }),
+      (error) => resolve({ error }),
+    );
+
+    storePendingRequest(pending).then(() => openApprovalPopup());
+  });
+}
+
+// ---------------------------------------------------------------------------
+// eth_sendTransaction handler
+// ---------------------------------------------------------------------------
+
+async function handleDappSendTransaction(
+  msg: DappRpcRequest,
+  senderTabId?: number | undefined,
+): Promise<DappRpcResponse> {
+  const site = await getConnectedSite(msg.origin);
+  if (!site) {
+    return { error: RPC_ERRORS.UNAUTHORIZED };
+  }
+
+  // Verify the 'from' address is in the site's authorized account list
+  const txParams = msg.params?.[0] as { from?: string } | undefined;
+  if (
+    txParams?.from &&
+    !site.accounts.some((a) => a.toLowerCase() === (txParams.from as string).toLowerCase())
+  ) {
+    return { error: { code: 4100, message: 'Account not authorized for this site' } };
+  }
+
+  return new Promise((resolve) => {
+    const reqId = crypto.randomUUID();
+    const pending: PendingDappRequest = {
+      id: reqId,
+      rpcId: msg.id,
+      method: msg.method,
+      params: msg.params,
+      origin: msg.origin,
+      favicon: msg.favicon,
+      title: msg.title,
+      tabId: senderTabId,
+      createdAt: Date.now(),
+    };
+
+    registerCallback(
+      reqId,
+      (result) => resolve({ result }),
+      (error) => resolve({ error }),
+    );
+
+    storePendingRequest(pending).then(() => openApprovalPopup());
+  });
+}
+
+// ---------------------------------------------------------------------------
+// personal_sign handler
+// ---------------------------------------------------------------------------
+
+async function handleDappPersonalSign(
+  msg: DappRpcRequest,
+  senderTabId?: number | undefined,
+): Promise<DappRpcResponse> {
+  const site = await getConnectedSite(msg.origin);
+  if (!site) {
+    return { error: RPC_ERRORS.UNAUTHORIZED };
+  }
+
+  // personal_sign params: [message, account] -- verify account is authorized
+  const account = msg.params?.[1] as string | undefined;
+  if (account && !site.accounts.some((a) => a.toLowerCase() === account.toLowerCase())) {
+    return { error: { code: 4100, message: 'Account not authorized for this site' } };
+  }
+
+  return new Promise((resolve) => {
+    const reqId = crypto.randomUUID();
+    const pending: PendingDappRequest = {
+      id: reqId,
+      rpcId: msg.id,
+      method: msg.method,
+      params: msg.params,
+      origin: msg.origin,
+      favicon: msg.favicon,
+      title: msg.title,
+      tabId: senderTabId,
+      createdAt: Date.now(),
+    };
+
+    registerCallback(
+      reqId,
+      (result) => resolve({ result }),
+      (error) => resolve({ error }),
+    );
+
+    storePendingRequest(pending).then(() => openApprovalPopup());
+  });
+}
+
+// ---------------------------------------------------------------------------
+// eth_signTypedData_v4 handler
+// ---------------------------------------------------------------------------
+
+async function handleDappSignTypedData(
+  msg: DappRpcRequest,
+  senderTabId?: number | undefined,
+): Promise<DappRpcResponse> {
+  const site = await getConnectedSite(msg.origin);
+  if (!site) {
+    return { error: RPC_ERRORS.UNAUTHORIZED };
+  }
+
+  // signTypedData_v4 params: [account, typedDataJSON] -- verify account is authorized
+  const account = msg.params?.[0] as string | undefined;
+  if (account && !site.accounts.some((a) => a.toLowerCase() === account.toLowerCase())) {
+    return { error: { code: 4100, message: 'Account not authorized for this site' } };
+  }
+
+  return new Promise((resolve) => {
+    const reqId = crypto.randomUUID();
+    const pending: PendingDappRequest = {
+      id: reqId,
+      rpcId: msg.id,
+      method: msg.method,
+      params: msg.params,
+      origin: msg.origin,
+      favicon: msg.favicon,
+      title: msg.title,
+      tabId: senderTabId,
+      createdAt: Date.now(),
+    };
+
+    registerCallback(
+      reqId,
+      (result) => resolve({ result }),
+      (error) => resolve({ error }),
+    );
+
+    storePendingRequest(pending).then(() => openApprovalPopup());
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Dapp execution handlers (called by popup after user approval)
+// ---------------------------------------------------------------------------
+
+async function handleDappExecuteTx(
+  requestId: string,
+  txParams: {
+    from: string;
+    to: string;
+    value?: string | undefined;
+    data?: string | undefined;
+    gas?: string | undefined;
+    maxFeePerGas?: string | undefined;
+    maxPriorityFeePerGas?: string | undefined;
+  },
+): Promise<WalletResponse> {
+  const session = await getSession();
+  if (!session) return { type: 'wallet:error', error: 'Wallet is locked' };
+  const network = await getNetworkPreference();
+
+  // Find account index from 'from' address
+  const accountIndex = session.accounts.findIndex(
+    (a) => a.address.toLowerCase() === txParams.from.toLowerCase(),
+  );
+  if (accountIndex === -1) return { type: 'wallet:error', error: 'Account not found' };
+
+  // Re-verify account authorization for this origin (defense in depth)
+  const pending = await getLatestPendingRequest();
+  if (pending) {
+    const site = await getConnectedSite(pending.origin);
+    if (site && !site.accounts.some((a) => a.toLowerCase() === txParams.from.toLowerCase())) {
+      return { type: 'wallet:error', error: 'Account not authorized for this site' };
+    }
+  }
+
+  const seed = hexToBytes(session.seed);
+  const account = session.accounts[accountIndex];
+  if (!account) return { type: 'wallet:error', error: 'Account not found' };
+  const kp = deriveAccount(seed, account.index);
+  const value = BigInt(txParams.value || '0x0');
+
+  try {
+    const [nonceRaw, feeParams, gasLimit] = await Promise.all([
+      rpcCall(network, 'eth_getTransactionCount', [kp.address, 'pending']),
+      getFeeParams(network),
+      txParams.gas
+        ? Promise.resolve(BigInt(txParams.gas))
+        : estimateGas(network, kp.address, txParams.to, value),
+    ]);
+    const nonce = BigInt(nonceRaw as string);
+
+    const { chainId } = NETWORKS[network];
+    const signedTx = buildAndSignTransaction({
+      to: txParams.to,
+      value,
+      nonce,
+      gasLimit: txParams.gas ? BigInt(txParams.gas) : gasLimit,
+      maxFeePerGas: txParams.maxFeePerGas ? BigInt(txParams.maxFeePerGas) : feeParams.maxFeePerGas,
+      maxPriorityFeePerGas: txParams.maxPriorityFeePerGas
+        ? BigInt(txParams.maxPriorityFeePerGas)
+        : feeParams.priorityFee,
+      chainId,
+      privateKey: kp.privateKey,
+      data: txParams.data,
+    });
+
+    // Send via realtime first, fallback to standard
+    let txHash: string;
+    try {
+      const receipt = await Promise.race([
+        rpcCall(network, 'realtime_sendRawTransaction', [signedTx]) as Promise<{
+          transactionHash: string;
+        }>,
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('realtime_timeout')), 10_000),
+        ),
+      ]);
+      txHash = (receipt as { transactionHash: string }).transactionHash;
+    } catch {
+      txHash = (await rpcCall(network, 'eth_sendRawTransaction', [signedTx])) as string;
+    }
+
+    // Resolve the pending dapp request with the txHash
+    resolveRequest(requestId, txHash);
+    await removePendingRequest(requestId);
+
+    return { type: 'dapp:txSent', txHash };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Transaction failed';
+    rejectRequest(requestId, { code: -32603, message: error });
+    await removePendingRequest(requestId);
+    return { type: 'wallet:error', error };
+  }
+}
+
+async function handleDappExecutePersonalSign(
+  requestId: string,
+  message: string,
+  account: string,
+): Promise<WalletResponse> {
+  const session = await getSession();
+  if (!session) return { type: 'wallet:error', error: 'Wallet is locked' };
+
+  const accountIndex = session.accounts.findIndex(
+    (a) => a.address.toLowerCase() === account.toLowerCase(),
+  );
+  if (accountIndex === -1) return { type: 'wallet:error', error: 'Account not found' };
+
+  const seed = hexToBytes(session.seed);
+  const acct = session.accounts[accountIndex];
+  if (!acct) return { type: 'wallet:error', error: 'Account not found' };
+  const kp = deriveAccount(seed, acct.index);
+
+  try {
+    const { eip191Signer } = await import('micro-eth-signer');
+    const signature = eip191Signer.sign(message, kp.privateKey);
+
+    resolveRequest(requestId, signature);
+    await removePendingRequest(requestId);
+
+    return { type: 'dapp:signed', signature };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Signing failed';
+    rejectRequest(requestId, { code: -32603, message: error });
+    await removePendingRequest(requestId);
+    return { type: 'wallet:error', error };
+  }
+}
+
+async function handleDappExecuteSignTypedData(
+  requestId: string,
+  typedData: unknown,
+  account: string,
+): Promise<WalletResponse> {
+  const session = await getSession();
+  if (!session) return { type: 'wallet:error', error: 'Wallet is locked' };
+
+  const accountIndex = session.accounts.findIndex(
+    (a) => a.address.toLowerCase() === account.toLowerCase(),
+  );
+  if (accountIndex === -1) return { type: 'wallet:error', error: 'Account not found' };
+
+  const seed = hexToBytes(session.seed);
+  const acct = session.accounts[accountIndex];
+  if (!acct) return { type: 'wallet:error', error: 'Account not found' };
+  const kp = deriveAccount(seed, acct.index);
+
+  try {
+    const { signTyped } = await import('micro-eth-signer');
+    const signature = signTyped(typedData as Parameters<typeof signTyped>[0], kp.privateKey);
+
+    resolveRequest(requestId, signature);
+    await removePendingRequest(requestId);
+
+    return { type: 'dapp:signed', signature };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Signing failed';
+    rejectRequest(requestId, { code: -32603, message: error });
+    await removePendingRequest(requestId);
+    return { type: 'wallet:error', error };
+  }
+}
+
+async function handleDappSimulate(txParams: {
+  from: string;
+  to: string;
+  value?: string | undefined;
+  data?: string | undefined;
+}): Promise<WalletResponse> {
+  const network = await getNetworkPreference();
+  try {
+    const balanceHex = await rpcCall(network, 'eth_getBalance', [txParams.from, 'latest']);
+    const ethBefore = BigInt(balanceHex as string);
+
+    // Simulate via eth_call -- if it reverts, the tx would fail
+    try {
+      await rpcCall(network, 'eth_call', [
+        {
+          from: txParams.from,
+          to: txParams.to,
+          data: txParams.data,
+          value: txParams.value,
+        },
+        'latest',
+      ]);
+    } catch (err) {
+      const error = err instanceof Error ? err.message : 'Simulation failed';
+      return {
+        type: 'dapp:simulated',
+        ethBefore: `0x${ethBefore.toString(16)}`,
+        ethAfter: `0x${ethBefore.toString(16)}`,
+        success: false,
+        error,
+      };
+    }
+
+    // Estimate the ETH diff (value transfer + gas)
+    const valueBigInt = BigInt(txParams.value || '0x0');
+    const ethAfter = ethBefore - valueBigInt;
+    return {
+      type: 'dapp:simulated',
+      ethBefore: `0x${ethBefore.toString(16)}`,
+      ethAfter: `0x${ethAfter.toString(16)}`,
+      success: true,
+    };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Simulation failed';
+    return {
+      type: 'dapp:simulated',
+      ethBefore: '0x0',
+      ethAfter: '0x0',
+      success: false,
+      error,
+    };
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Listener registration
 // ---------------------------------------------------------------------------
 
@@ -749,7 +1288,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   // Reject content script / inpage origins
   if (sender.origin && !sender.origin.startsWith('chrome-extension://')) return;
 
-  if (msg.type?.startsWith('wallet:')) {
+  if (msg.type?.startsWith('wallet:') || msg.type?.startsWith('dapp:')) {
     handleWalletMessage(msg as WalletMessage).then(sendResponse);
     return true; // async response
   }
@@ -764,7 +1303,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return;
   if (msg.type !== 'dapp:rpc') return;
 
-  handleDappRpc(msg as DappRpcRequest).then(sendResponse);
+  handleDappRpc(msg as DappRpcRequest, sender.tab?.id).then(sendResponse);
   return true; // async response
 });
 

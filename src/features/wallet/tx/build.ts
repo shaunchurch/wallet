@@ -18,6 +18,7 @@ export function buildAndSignTransaction(params: {
   maxPriorityFeePerGas: bigint;
   chainId: number;
   privateKey: Uint8Array;
+  data?: string | undefined;
 }): string {
   const tx = Transaction.prepare({
     to: params.to,
@@ -27,6 +28,7 @@ export function buildAndSignTransaction(params: {
     maxFeePerGas: params.maxFeePerGas,
     maxPriorityFeePerGas: params.maxPriorityFeePerGas,
     chainId: BigInt(params.chainId),
+    ...(params.data && params.data !== '0x' ? { data: params.data } : {}),
   });
   const signed = tx.signBy(params.privateKey);
   return signed.toHex(); // includes 0x prefix

@@ -75,7 +75,34 @@ export type WalletMessage =
   | { type: 'wallet:estimateGas'; to: string; value: string; accountIndex: number }
   | { type: 'wallet:getFeeParams' }
   | { type: 'wallet:getEthPrice' }
-  | { type: 'wallet:sendTransaction'; to: string; value: string; accountIndex: number };
+  | { type: 'wallet:sendTransaction'; to: string; value: string; accountIndex: number }
+  | { type: 'dapp:approve'; requestId: string; result: unknown }
+  | { type: 'dapp:reject'; requestId: string }
+  | { type: 'dapp:getPendingRequest' }
+  | {
+      type: 'dapp:executeTx';
+      requestId: string;
+      txParams: {
+        from: string;
+        to: string;
+        value?: string | undefined;
+        data?: string | undefined;
+        gas?: string | undefined;
+        maxFeePerGas?: string | undefined;
+        maxPriorityFeePerGas?: string | undefined;
+      };
+    }
+  | { type: 'dapp:signPersonal'; requestId: string; message: string; account: string }
+  | { type: 'dapp:signTypedData'; requestId: string; typedData: unknown; account: string }
+  | {
+      type: 'dapp:simulate';
+      txParams: {
+        from: string;
+        to: string;
+        value?: string | undefined;
+        data?: string | undefined;
+      };
+    };
 
 // Response types -- background sends back
 export type WalletResponse =
@@ -123,4 +150,16 @@ export type WalletResponse =
       explorerUrl: string;
       error?: string;
     }
-  | { type: 'wallet:error'; error: string };
+  | { type: 'wallet:error'; error: string }
+  | { type: 'dapp:pendingRequest'; request: unknown | null }
+  | { type: 'dapp:approved' }
+  | { type: 'dapp:rejected' }
+  | { type: 'dapp:txSent'; txHash: string }
+  | { type: 'dapp:signed'; signature: string }
+  | {
+      type: 'dapp:simulated';
+      ethBefore: string;
+      ethAfter: string;
+      success: boolean;
+      error?: string | undefined;
+    };

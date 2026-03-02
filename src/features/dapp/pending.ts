@@ -5,11 +5,11 @@ export interface PendingDappRequest {
   id: string; // unique request ID (crypto.randomUUID())
   rpcId: number; // original RPC request ID from inpage
   method: string; // eth_requestAccounts, eth_sendTransaction, etc.
-  params?: unknown[];
+  params?: unknown[] | undefined;
   origin: string;
-  favicon?: string;
-  title?: string;
-  tabId?: number; // originating tab for SW-restart fallback
+  favicon?: string | undefined;
+  title?: string | undefined;
+  tabId?: number | undefined; // originating tab for SW-restart fallback
   createdAt: number;
 }
 
